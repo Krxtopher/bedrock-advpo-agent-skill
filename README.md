@@ -17,7 +17,7 @@ Compatible with any coding agent that supports the [Agent Skills standard](https
 Install the skill to your agent using the [skills CLI](https://github.com/vercel-labs/skills):
 
 ```bash
-npx skills add --agent kiro-cli <org>/bedrock-advpo-agent-skill
+npx skills add --agent kiro-cli https://github.com/Krxtopher/bedrock-advpo-agent-skill
 ```
 
 Or from a local clone:
