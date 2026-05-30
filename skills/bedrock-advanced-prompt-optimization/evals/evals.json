@@ -76,7 +76,7 @@
         {
             "id": "asks-for-region",
             "name": "Always asks user for AWS region explicitly",
-            "prompt": "I want to optimize a prompt. Single model, Nova 2 Lite, Lambda evaluator. My bucket is my-test-bucket.",
+            "prompt": "I want to optimize a prompt. Single model, Nova 2 Lite, Lambda evaluator. My bucket is my-test-bucket. It's a structured extraction task and my samples are ready. What else do you need?",
             "expected_output": "The agent asks which AWS region to use.",
             "assertions": [
                 "The response asks the user which AWS region to use.",
