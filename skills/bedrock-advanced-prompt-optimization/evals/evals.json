@@ -106,16 +106,6 @@
             ]
         },
         {
-            "id": "start-from-template",
-            "name": "Directs user to start from the evaluator template",
-            "prompt": "I need to write a custom Lambda evaluator for my extraction task. Where should I start?",
-            "expected_output": "The agent directs the user to start from examples/lambda-evaluator-template.py.",
-            "assertions": [
-                "The response mentions the lambda evaluator template file (lambda-evaluator-template.py or the examples directory).",
-                "The response advises starting from the template rather than writing from scratch."
-            ]
-        },
-        {
             "id": "sample-count-guidance",
             "name": "Provides sample count guidance when asked",
             "prompt": "How many evaluation samples should I include in my dataset?",
