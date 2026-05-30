@@ -97,7 +97,7 @@
         {
             "id": "sandbox-avoids-re-compile",
             "name": "Generates evaluator code without re.compile()",
-            "prompt": "Write me a Lambda evaluator that checks if the model output contains a date in YYYY-MM-DD format.",
+            "prompt": "Write me a Lambda evaluator that checks if the model output contains a date in YYYY-MM-DD format. Don't ask me for additional detail, just write the code.",
             "expected_output": "The agent produces evaluator code that does NOT use re.compile(). It may use re.search(), re.match(), re.findall(), or string methods instead.",
             "assertions": [
                 "The generated code does NOT contain 're.compile'.",
