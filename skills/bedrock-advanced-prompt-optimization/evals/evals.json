@@ -7,8 +7,8 @@
             "prompt": "I want to optimize a prompt for better performance.",
             "expected_output": "The agent asks a single question and waits for a response.",
             "assertions": [
-                "The response contains exactly one question mark, indicating a single question was asked.",
-                "The response does NOT contain multiple numbered questions or a list of questions."
+                "The response ends with or contains a question directed at the user.",
+                "The response does NOT contain multiple numbered questions or a list of questions asking for different pieces of information."
             ]
         },
         {
@@ -35,12 +35,12 @@
         {
             "id": "educate-as-you-go",
             "name": "Explains concepts before asking user to decide",
-            "prompt": "I want to optimize a prompt for a single model. The model is Nova 2 Lite. What evaluation method should I use?",
-            "expected_output": "The agent explains what evaluation methods are and why the choice matters before asking the user to decide.",
+            "prompt": "I want to optimize a prompt for a single model. The model is Nova 2 Lite. I have ground truth data with clear right/wrong answers. What evaluation method should I use?",
+            "expected_output": "The agent explains what evaluation methods are available and why one might be better, before or alongside asking the user to choose.",
             "assertions": [
-                "The response explains what at least one evaluation method is (Lambda evaluator, LLM-as-a-judge, or steering criteria) in plain language.",
-                "The explanation comes BEFORE or alongside the question, not after.",
-                "The response does NOT assume the user already knows what these evaluation methods are."
+                "The response mentions at least one evaluation method by name (Lambda evaluator, LLM-as-a-judge, or steering criteria).",
+                "The response provides a brief explanation of what at least one method does or when it's appropriate.",
+                "The response does NOT simply ask the user to pick without any context about what the options mean."
             ]
         },
         {
@@ -95,13 +95,14 @@
             ]
         },
         {
-            "id": "sandbox-restrictions-awareness",
-            "name": "Warns about re.compile when writing evaluator code",
-            "prompt": "I need a Lambda evaluator that uses regex to validate date formats in the model output. Can you write one?",
-            "expected_output": "The agent warns that re.compile() is blocked in the sandbox and suggests alternatives like re.search() or string methods.",
+            "id": "sandbox-avoids-re-compile",
+            "name": "Generates evaluator code without re.compile()",
+            "prompt": "Write me a Lambda evaluator that checks if the model output contains a date in YYYY-MM-DD format.",
+            "expected_output": "The agent produces evaluator code that does NOT use re.compile(). It may use re.search(), re.match(), re.findall(), or string methods instead.",
             "assertions": [
-                "The response mentions that compile or re.compile is blocked or restricted in the evaluator sandbox.",
-                "The response suggests an alternative approach (re.search, re.match, re.findall, re.sub, or string methods)."
+                "The generated code does NOT contain 're.compile'.",
+                "The generated code uses an alternative like re.search, re.match, re.findall, re.sub, or string methods to check the date format.",
+                "The code starts from or references the lambda-evaluator-template.py structure (lambda_handler with preds/golds keys)."
             ]
         },
         {
