@@ -2,6 +2,16 @@
 
 This document covers setting up the development environment, running behavioral evals, and understanding the project structure.
 
+## Toolchain Overview
+
+Development on this skill uses three main tools:
+
+- **[Amazon Bedrock](https://aws.amazon.com/bedrock/)** — the AWS service that hosts the foundation models (Claude Sonnet, Claude Opus) used for both agent inference and eval grading.
+- **[agent-skills-eval](https://github.com/darkrishabh/agent-skills-eval)** — a Node.js test runner for the [Agent Skills standard](https://agentskills.io). It sends prompts to a model with and without the skill loaded, then uses a judge model to grade the responses against assertions you define.
+- **[LiteLLM](https://docs.litellm.ai/)** — a local proxy that exposes an OpenAI-compatible API and routes requests to Bedrock. This is needed because `agent-skills-eval` speaks the OpenAI API format, but Anthropic models on Bedrock don't support that endpoint natively.
+
+The flow: `agent-skills-eval` → LiteLLM (localhost:4000) → Amazon Bedrock → Claude models.
+
 ## Prerequisites
 
 - Python 3.10+
@@ -23,7 +33,7 @@ pip install -r requirements.txt
 
 ### Node.js
 
-Use when running the `agent-skills-eval` test harness that runs behavioral evals 
+Used when running the `agent-skills-eval` test harness that runs behavioral evals.
 
 ```bash
 npm install
