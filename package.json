@@ -1,0 +1,26 @@
+{
+  "name": "bedrock-advpo-agent-skill",
+  "version": "1.0.0",
+  "description": "An agent skill for [Kiro IDE](https://kiro.dev) that lets AI coding agents create, manage, and analyze [Amazon Bedrock Advanced Prompt Optimization](https://docs.aws.amazon.com/bedrock/latest/userguide/advanced-prompts.html) jobs through a guided conversational workflow.",
+  "main": "index.js",
+  "scripts": {
+    "eval": "npx agent-skills-eval --config agent-skills-eval.yaml",
+    "eval:no-baseline": "npx agent-skills-eval --config agent-skills-eval.yaml --no-baseline",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Krxtopher/bedrock-advpo-agent-skill.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Krxtopher/bedrock-advpo-agent-skill/issues"
+  },
+  "homepage": "https://github.com/Krxtopher/bedrock-advpo-agent-skill#readme",
+  "devDependencies": {
+    "agent-skills-eval": "^0.1.1"
+  }
+}

@@ -1,0 +1,23 @@
+# Agent Skills Eval configuration
+# Run with: npx agent-skills-eval --config agent-skills-eval.yaml
+
+root: ./skills
+workspace: ./agent-skills-workspace
+baseline: true
+target: gpt-4o-mini
+judge: gpt-4o-mini
+apiKeyEnv: OPENAI_API_KEY
+concurrency: 2
+layout: iteration
+strict: false
+report:
+  enabled: true
+  title: Advanced Prompt Optimization Skill Evals
+logging:
+  format: pretty
+  verbose: false
+  color: auto
+targetParams:
+  temperature: 0
+judgeParams:
+  temperature: 0
