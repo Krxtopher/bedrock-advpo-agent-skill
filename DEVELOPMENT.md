@@ -6,11 +6,9 @@ This document covers setting up the development environment, running behavioral 
 
 Development on this skill uses three main tools:
 
-- **[Amazon Bedrock](https://aws.amazon.com/bedrock/)** — the AWS service that hosts the foundation models (Claude Sonnet, Claude Opus) used for both agent inference and eval grading.
+- **[Amazon Bedrock](https://aws.amazon.com/bedrock/)** — the AWS service that hosts the foundation models (Claude Sonnet, Claude Opus) used for behavioral testing of the skill.
 - **[agent-skills-eval](https://github.com/darkrishabh/agent-skills-eval)** — a Node.js test runner for the [Agent Skills standard](https://agentskills.io). It sends prompts to a model with and without the skill loaded, then uses a judge model to grade the responses against assertions you define.
-- **[LiteLLM](https://docs.litellm.ai/)** — a local proxy that exposes an OpenAI-compatible API and routes requests to Bedrock. This is needed because `agent-skills-eval` speaks the OpenAI API format, but Anthropic models on Bedrock don't support that endpoint natively.
-
-The flow: `agent-skills-eval` → LiteLLM (localhost:4000) → Amazon Bedrock → Claude models.
+- **[LiteLLM](https://docs.litellm.ai/)** — a local proxy that exposes an OpenAI-compatible API and routes requests to Bedrock. This is needed because `agent-skills-eval` speaks the OpenAI API format, but Anthropic models on Bedrock don't support that API natively.
 
 ## Prerequisites
 
@@ -41,7 +39,7 @@ npm install
 
 ### AWS Credentials
 
-You need AWS credentials with access to Bedrock (for running evals against Claude models). The default profile is used automatically.
+You need AWS credentials with access to Bedrock (for running evals against Claude models). Your default profile is used automatically.
 
 ## Running Behavioral Evals
 
@@ -106,6 +104,16 @@ This runs each eval twice — once with the skill loaded, once without — and r
 ### Nondeterminism
 
 Agent behavior varies between runs. Expect pass rates in the 90–100% range rather than a fixed 100%. A single failure on one run doesn't necessarily indicate a skill defect — run 3–5 times to see the distribution.
+
+### Asking your agent to run evals
+
+If you're developing in Kiro or another AI coding agent, you can ask it to run the evals for you. Example prompts:
+
+- "Run the behavioral evals and tell me the results."
+- "Start the LiteLLM proxy and run the skill evals. Show me any failures."
+- "I just changed SKILL.md. Run the evals to check for regressions."
+
+The agent will start the proxy, execute the eval command, and summarize the pass/fail results — including judge reasoning for any failures.
 
 ### Writing good evals
 
