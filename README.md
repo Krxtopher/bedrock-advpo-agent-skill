@@ -60,3 +60,7 @@ For other compatible agents, point them at the `SKILL.md` file for the full work
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Development
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for setup instructions, running unit tests, and running behavioral evals.

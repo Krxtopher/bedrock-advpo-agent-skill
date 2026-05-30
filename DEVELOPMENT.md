@@ -4,8 +4,9 @@ This document covers setting up the development environment, running behavioral 
 
 ## Toolchain Overview
 
-Development on this skill uses three main tools:
+Development on this skill uses four main tools:
 
+- **[pytest](https://docs.pytest.org/)** — the unit test framework for validating the skill's Python scripts. Tests run locally without AWS credentials or network access (boto3 calls are mocked).
 - **[Amazon Bedrock](https://aws.amazon.com/bedrock/)** — the AWS service that hosts the foundation models (Claude Sonnet, Claude Opus) used for behavioral testing of the skill.
 - **[agent-skills-eval](https://github.com/darkrishabh/agent-skills-eval)** — a Node.js test runner for the [Agent Skills standard](https://agentskills.io). It sends prompts to a model with and without the skill loaded, then uses a judge model to grade the responses against assertions you define.
 - **[LiteLLM](https://docs.litellm.ai/)** — a local proxy that exposes an OpenAI-compatible API and routes requests to Bedrock. This is needed because `agent-skills-eval` speaks the OpenAI API format, but Anthropic models on Bedrock don't support that API natively.
@@ -41,11 +42,40 @@ npm install
 
 You need AWS credentials with access to Bedrock (for running evals against Claude models). Your default profile is used automatically.
 
+## Running Unit Tests
+
+The skill's scripts have unit tests in `tests/` that validate internal logic without requiring AWS credentials or network access.
+
+```bash
+npm test
+```
+
+Or run pytest directly for more control:
+
+```bash
+source .venv/bin/activate
+python -m pytest tests/ -v
+```
+
+Tests cover scoring logic, dataset validation, job creation helpers, results parsing, prompt extraction, and multimodal sample building. They use mocked boto3 clients where AWS calls are involved.
+
 ## Running Behavioral Evals
 
 The skill includes behavioral evaluations that test whether an agent follows the SKILL.md instructions correctly. These use [agent-skills-eval](https://github.com/darkrishabh/agent-skills-eval) with Claude Sonnet as the target model and Claude Opus as the judge, running on Bedrock via [LiteLLM](https://docs.litellm.ai/) as a proxy.
 
-### Start the LiteLLM proxy
+If you're developing in Kiro or another AI coding agent, the easiest way to run evals is to ask your agent directly. Example prompts:
+
+- "Run the behavioral evals and tell me the results."
+- "Start the LiteLLM proxy and run the skill evals. Show me any failures."
+- "I just changed SKILL.md. Run the evals to check for regressions."
+
+The agent will start the proxy, execute the eval command, and summarize the pass/fail results — including judge reasoning for any failures.
+
+### Running evals manually
+
+If you prefer to run evals yourself or need more control over the process:
+
+#### Start the LiteLLM proxy
 
 In a dedicated terminal:
 
@@ -55,7 +85,7 @@ npm run eval:proxy
 
 This starts a local OpenAI-compatible API server on port 4000 that routes requests to Bedrock using your AWS credentials.
 
-### Run the evals
+#### Run the evals
 
 In another terminal:
 
@@ -66,7 +96,7 @@ LITELLM_API_KEY=sk-1234 npm run eval
 > [!NOTE]
 > The API key is a dummy value — LiteLLM doesn't validate it when running locally. Any non-empty string works.
 
-### Configuration
+#### Configuration
 
 - **Target model** (agent inference): Claude Sonnet 4.5 — matches what Kiro uses
 - **Judge model** (grading assertions): Claude Opus 4.6 — more capable, reduces false positives
@@ -84,14 +114,14 @@ LITELLM_API_KEY=sk-1234 npx agent-skills-eval ./skills \
   --log-format pretty
 ```
 
-### Results
+#### Results
 
 Results are written to `agent-skills-workspace/` (gitignored) with:
 - Per-eval pass/fail with judge reasoning
 - An HTML report at `agent-skills-workspace/iteration-N/report/index.html`
 - A `benchmark.json` with aggregate pass rates
 
-### Running with baseline comparison
+#### Running with baseline comparison
 
 To see how much lift the skill provides over a bare model:
 
@@ -101,19 +131,9 @@ LITELLM_API_KEY=sk-1234 npx agent-skills-eval --config agent-skills-eval.yaml --
 
 This runs each eval twice — once with the skill loaded, once without — and reports the delta.
 
-### Nondeterminism
+#### Nondeterminism
 
 Agent behavior varies between runs. Expect pass rates in the 90–100% range rather than a fixed 100%. A single failure on one run doesn't necessarily indicate a skill defect — run 3–5 times to see the distribution.
-
-### Asking your agent to run evals
-
-If you're developing in Kiro or another AI coding agent, you can ask it to run the evals for you. Example prompts:
-
-- "Run the behavioral evals and tell me the results."
-- "Start the LiteLLM proxy and run the skill evals. Show me any failures."
-- "I just changed SKILL.md. Run the evals to check for regressions."
-
-The agent will start the proxy, execute the eval command, and summarize the pass/fail results — including judge reasoning for any failures.
 
 ### Writing good evals
 
@@ -142,7 +162,7 @@ The eval framework is single-turn, but many skill behaviors only surface after s
 ```json
 {
     "id": "asks-for-region",
-    "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What region should I use for the job?",
+    "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What's next?",
     "assertions": [
         "The response asks the user which AWS region to use.",
         "The response does NOT assume a region without confirming with the user."
@@ -221,9 +241,10 @@ skills/bedrock-advanced-prompt-optimization/
 Top-level dev files:
 
 ```
+tests/                   # Unit tests (pytest) for skill scripts
 agent-skills-eval.yaml   # Eval harness configuration
 litellm-config.yaml      # LiteLLM proxy model routing
-package.json             # Node.js scripts for running evals
-requirements.txt         # Python dependencies (litellm, boto3)
+package.json             # Node.js scripts for running evals and tests
+requirements.txt         # Python dependencies (litellm, boto3, pytest)
 AGENTS.md                # Agent-facing project context
 ```

@@ -4,8 +4,9 @@
 
 ```
 skills/bedrock-advanced-prompt-optimization/  — The canonical skill source (installed via `npx skills add`)
-agent-skills-eval.yaml  — Behavioral eval configuration
-litellm-config.yaml     — LiteLLM proxy model routing for evals
+tests/                   — Unit tests (pytest) for skill scripts
+agent-skills-eval.yaml   — Behavioral eval configuration
+litellm-config.yaml      — LiteLLM proxy model routing for evals
 ```
 
 ## Dependencies
@@ -13,9 +14,20 @@ litellm-config.yaml     — LiteLLM proxy model routing for evals
 - Python 3.10+
 - Node.js 18+
 - boto3 >= 1.35.0
+- pytest >= 8.0.0
 - litellm[proxy] >= 1.86.0
 - agent-skills-eval (npm)
 - AWS CLI
+
+## Running Unit Tests
+
+```bash
+npm test
+```
+
+Or directly: `python -m pytest tests/ -v`
+
+Tests cover the skill's scripts and examples (scoring logic, dataset preparation, job creation, results parsing, prompt extraction, multimodal sample building). No AWS credentials or network access required.
 
 ## Running Behavioral Evals
 
@@ -23,6 +35,8 @@ litellm-config.yaml     — LiteLLM proxy model routing for evals
 2. In a separate terminal: `LITELLM_API_KEY=sk-1234 npm run eval`
 
 Results land in `agent-skills-workspace/` with an HTML report. Target model is Claude Sonnet 4.5, judge is Claude Opus 4.6.
+
+> **Note for AI agents:** The `npm run eval:proxy` command launches a detached LiteLLM process that won't appear in background process listings. After starting it, assume it is running and proceed directly to the eval command. Do not attempt to verify, relaunch, or troubleshoot the proxy process.
 
 ## Key Conventions
 

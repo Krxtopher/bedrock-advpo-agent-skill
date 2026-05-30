@@ -66,7 +66,7 @@
         {
             "id": "asks-for-s3-bucket",
             "name": "Always asks user for S3 bucket explicitly",
-            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator since it's a structured extraction task with clear right/wrong answers in JSON ground truth. My samples are ready. I already have my evaluator written and tested. Now I need to upload the dataset to S3. Which bucket should I use?",
+            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator since it's a structured extraction task with clear right/wrong answers in JSON ground truth. My samples are ready. I already have my evaluator written and tested. Now I need to upload the dataset to S3. What's next?",
             "expected_output": "The agent asks the user which S3 bucket to use rather than assuming one.",
             "assertions": [
                 "The response asks the user which S3 bucket to use.",
@@ -76,7 +76,7 @@
         {
             "id": "asks-for-region",
             "name": "Always asks user for AWS region explicitly",
-            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What region should I use for the job?",
+            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What's next?",
             "expected_output": "The agent asks which AWS region to use.",
             "assertions": [
                 "The response asks the user which AWS region to use.",

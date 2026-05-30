@@ -7,7 +7,7 @@
     "eval": "npx agent-skills-eval --config agent-skills-eval.yaml",
     "eval:no-baseline": "npx agent-skills-eval --config agent-skills-eval.yaml --no-baseline",
     "eval:proxy": "litellm --config litellm-config.yaml --port 4000",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "python -m pytest tests/ -v"
   },
   "repository": {
     "type": "git",
