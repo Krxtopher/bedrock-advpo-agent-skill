@@ -1,4 +1,4 @@
-"""Extract the optimized prompt from AdvPO results and save as a clean file.
+"""Extract the optimized prompt from Advanced Prompt Optimization results and save as a clean file.
 
 Reads the results JSONL (local or from S3), extracts the optimized prompt
 template for a given template ID and model, and writes it to a file ready
@@ -164,8 +164,8 @@ def extract_optimized_prompt(
         print("ERROR: No optimized prompt template found.", file=sys.stderr)
         sys.exit(1)
 
-    # Convert AdvPO escaped braces back to normal braces
-    # AdvPO uses {{ and }} to escape literal braces in the template
+    # Convert Advanced Prompt Optimization escaped braces back to normal braces
+    # Advanced Prompt Optimization uses {{ and }} to escape literal braces in the template
     optimized_template = optimized_template.replace("{{", "{").replace("}}", "}")
 
     return optimized_template
@@ -173,7 +173,7 @@ def extract_optimized_prompt(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Extract the optimized prompt from AdvPO results."
+        description="Extract the optimized prompt from Advanced Prompt Optimization results."
     )
 
     # Source: local file or S3

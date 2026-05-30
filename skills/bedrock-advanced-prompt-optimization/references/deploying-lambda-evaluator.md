@@ -11,9 +11,9 @@ When using a custom Lambda evaluator, you need to deploy a Lambda function and c
 - Never crash — return 0.0 on errors
 - Timeout: set to 900 seconds (max) for large batches
 
-## AdvPO Event Format
+## Advanced Prompt Optimization Event Format
 
-The AdvPO service invokes your Lambda with this exact event structure:
+The Advanced Prompt Optimization service invokes your Lambda with this exact event structure:
 
 ```json
 {"preds": ["model_output_1", "model_output_2", ...], "golds": ["reference_1", "reference_2", ...]}

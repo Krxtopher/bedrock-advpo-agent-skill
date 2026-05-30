@@ -20,4 +20,4 @@ Compare the model's response against the ground truth field by field:
    - Missing, null when expected, or incorrect value: no credit
 3. Calculate the percentage of fields correctly extracted.
 
-Return a score from 0 to 100 representing extraction accuracy.
+Return a score from 0.0 to 1.0 representing extraction accuracy.

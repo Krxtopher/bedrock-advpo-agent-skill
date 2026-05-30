@@ -1,10 +1,10 @@
-# Bedrock Advanced Prompt Optimization (AdvPO) Agent Skill
+# Bedrock Advanced Prompt Optimization Agent Skill
 
 An agent skill for [Kiro IDE](https://kiro.dev) that lets AI coding agents create, manage, and analyze [Amazon Bedrock Advanced Prompt Optimization](https://docs.aws.amazon.com/bedrock/latest/userguide/advanced-prompts.html) jobs through a guided conversational workflow.
 
 ## What It Does
 
-AdvPO takes your prompt templates, evaluation samples, and a scoring method, then runs iterative inference → evaluate → rewrite loops. The result is an optimized prompt tailored to a specific model (or a comparison across multiple models).
+Advanced Prompt Optimization takes your prompt templates, evaluation samples, and a scoring method, then runs iterative inference → evaluate → rewrite loops. The result is an optimized prompt tailored to a specific model (or a comparison across multiple models).
 
 This skill packages the entire workflow — dataset preparation, evaluator deployment, job creation, monitoring, and result extraction — into scripts that an AI agent orchestrates on your behalf.
 
@@ -50,7 +50,7 @@ skills/bedrock-advanced-prompt-optimization/
 ├── scripts/
 │   ├── build_samples.py              # Upload assets to S3, generate samples JSON
 │   ├── cleanup_resources.py          # Delete AWS resources created during a run
-│   ├── create_job.py                 # Create an AdvPO optimization job
+│   ├── create_job.py                 # Create an Advanced Prompt Optimization optimization job
 │   ├── deploy_evaluator.py           # Deploy a Lambda evaluator (IAM + function)
 │   ├── extract_prompt.py             # Extract the optimized prompt from results
 │   ├── manage_job.py                 # List, monitor, stop, or delete jobs
@@ -87,7 +87,7 @@ The skill guides you through these steps:
 
 ## Usage
 
-In Kiro IDE, activate the skill by mentioning prompt optimization, AdvPO, or related topics in a vibe session. The agent will walk you through the workflow interactively, asking one question at a time.
+In Kiro IDE, activate the skill by mentioning prompt optimization, Advanced Prompt Optimization, or related topics in a vibe session. The agent will walk you through the workflow interactively, asking one question at a time.
 
 For other compatible agents, point them at the `SKILL.md` file for the full workflow instructions.
 

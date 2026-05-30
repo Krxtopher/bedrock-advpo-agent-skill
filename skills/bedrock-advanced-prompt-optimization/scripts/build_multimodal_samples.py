@@ -1,4 +1,4 @@
-"""Build an AdvPO samples JSON file from local multimodal (image/PDF) files.
+"""Build an Advanced Prompt Optimization samples JSON file from local multimodal (image/PDF) files.
 
 This script is only needed for multimodal datasets — where each evaluation
 sample includes a document image or PDF alongside the prompt. For text-only
@@ -72,7 +72,7 @@ def upload_to_s3(local_path: Path, bucket: str, key: str, region: str) -> tuple[
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build AdvPO samples JSON from ground truth + document files."
+        description="Build Advanced Prompt Optimization samples JSON from ground truth + document files."
     )
     parser.add_argument(
         "--assets-dir",

@@ -1,4 +1,4 @@
-"""Delete AWS resources created during an AdvPO workflow.
+"""Delete AWS resources created during an Advanced Prompt Optimization workflow.
 
 Reads advpo-resources.json and deletes each tracked resource,
 prompting for confirmation by resource type.
@@ -81,7 +81,7 @@ def delete_s3_object(uri: str, region: str) -> bool:
 
 
 def delete_advpo_job(arn: str, region: str) -> bool:
-    """Delete an AdvPO job."""
+    """Delete an Advanced Prompt Optimization job."""
     result = subprocess.run(
         ["aws", "bedrock", "delete-advanced-prompt-optimization-job",
          "--advanced-prompt-optimization-job-arn", arn,
@@ -102,7 +102,7 @@ TYPE_LABELS = {
     "lambda": "Lambda Functions",
     "iam_role": "IAM Roles",
     "s3": "S3 Objects",
-    "advpo_job": "AdvPO Jobs",
+    "advpo_job": "Advanced Prompt Optimization Jobs",
 }
 
 

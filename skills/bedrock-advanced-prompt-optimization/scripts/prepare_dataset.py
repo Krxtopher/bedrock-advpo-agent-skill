@@ -124,7 +124,7 @@ def build_dataset_record(
     metric_label: str | None = None,
     lambda_arn: str | None = None,
 ) -> dict:
-    """Build a single JSONL record for the AdvPO input dataset."""
+    """Build a single JSONL record for the Advanced Prompt Optimization input dataset."""
     record: dict = {
         "version": SCHEMA_VERSION,
         "templateId": template_id,
@@ -181,7 +181,7 @@ def load_text_from_file_or_string(value: str | None, file_path: Path | None) -> 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Prepare a JSONL input dataset for Bedrock AdvPO."
+        description="Prepare a JSONL input dataset for Bedrock Advanced Prompt Optimization."
     )
     parser.add_argument(
         "--output",

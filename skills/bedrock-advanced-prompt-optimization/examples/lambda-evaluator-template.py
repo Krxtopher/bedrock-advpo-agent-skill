@@ -1,26 +1,39 @@
-"""Lambda evaluator template for AdvPO.
+"""Lambda evaluator template for Advanced Prompt Optimization.
 
 IMPORTANT: Do NOT modify the lambda_handler function or the event key names.
-AdvPO sends events with exactly these keys:
+Advanced Prompt Optimization sends events with exactly these keys:
   - "preds": list of model output strings
   - "golds": list of reference/ground truth strings
 
 Customize ONLY the compute_score function to implement your scoring logic.
 
 SANDBOX RESTRICTIONS:
-  AdvPO validates Lambda evaluator code in a sandbox that blocks certain
-  Python builtins considered dangerous. Notably, `compile()` is blocked —
-  which means `re.compile()` and any use of the `re` module will cause the
-  job to fail with: "Metric code validation failed: Uses potentially
-  dangerous builtin: compile()"
+  Customer evaluator code is statically scanned before deployment. Any function
+  literally named `compile`, `exec`, `eval`, `__import__`, `globals`, `locals`,
+  `breakpoint`, `exit`, `quit`, or `open` is rejected. This means `re.compile()`
+  is blocked — but `re.search()`, `re.match()`, `re.findall()`, and `re.sub()`
+  all work normally and accept the pattern as a string argument.
 
-  Avoid `re` entirely in evaluator functions. Use string methods (startswith,
-  endswith, split, strip, replace) for text manipulation instead. The
-  `strip_code_fences()` utility below handles the most common case where
-  regex would otherwise be tempting.
+  Imports that touch the filesystem, network, or process state are also blocked:
+  os, subprocess, shutil, socket, ctypes, multiprocessing, signal, pickle,
+  shelve, marshal, mmap, http, ftplib, smtplib, telnetlib, xmlrpc, webbrowser,
+  pty, fcntl, resource. Use stdlib equivalents (json, math, datetime, statistics,
+  hashlib, etc.) and the approved third-party metric libraries instead.
+
+  Approved third-party libraries: numpy, scipy, pandas, scikit-learn, nltk,
+  rouge_score, sacrebleu, evaluate, rapidfuzz, editdistance, jiwer, regex,
+  transformers, torch, sentence_transformers, bert_score.
 """
 
 import json
+
+
+# Optional: declare external dependencies explicitly. If present, this overrides
+# import inference. Use pip-style version specifiers.
+DEPENDENCIES = [
+    # "numpy>=1.20",
+    # "scikit-learn",
+]
 
 
 # =============================================================================
@@ -28,7 +41,7 @@ import json
 # =============================================================================
 
 def lambda_handler(event: dict, context) -> dict:
-    """AWS Lambda entry point. Called by the AdvPO service.
+    """AWS Lambda entry point. Called by the Advanced Prompt Optimization service.
 
     Event format (fixed, do not change key names):
     {
@@ -62,7 +75,7 @@ def strip_code_fences(text: str) -> str:
     Many models wrap JSON output in code fences. Use this before json.loads()
     to handle that gracefully without penalizing otherwise-correct output.
 
-    This implementation avoids the `re` module, which is blocked by the AdvPO
+    This implementation avoids the `re` module, which is blocked by the Advanced Prompt Optimization
     sandbox (see module docstring for details).
     """
     stripped = text.strip()
@@ -130,31 +143,33 @@ def _score_single(pred: str, gold: str) -> float:
     Replace this with your actual scoring logic. This example does a simple
     exact-match comparison of JSON fields.
 
-    Returns a float between 0.0 and 1.0. Must never raise an exception.
+    Returns a float between 0.0 and 1.0. Must never raise an exception —
+    any error becomes 0.0 so one bad sample doesn't fail the whole batch.
     """
     try:
         pred_obj = parse_json_output(pred)
-    except (json.JSONDecodeError, TypeError, ValueError):
+
+        try:
+            gold_obj = json.loads(gold)
+        except (json.JSONDecodeError, TypeError):
+            return 0.0
+
+        if not gold_obj:
+            return 0.0
+
+        # Example: average exact match across all fields in the ground truth
+        matches = 0
+        total = 0
+        for key, expected in gold_obj.items():
+            total += 1
+            actual = pred_obj.get(key)
+            if _normalize(actual) == _normalize(expected):
+                matches += 1
+
+        return matches / total if total > 0 else 0.0
+    except Exception as exc:
+        print(f"score error: {type(exc).__name__}: {exc}")
         return 0.0
-
-    try:
-        gold_obj = json.loads(gold)
-    except (json.JSONDecodeError, TypeError):
-        return 0.0
-
-    if not gold_obj:
-        return 0.0
-
-    # Example: average exact match across all fields in the ground truth
-    matches = 0
-    total = 0
-    for key, expected in gold_obj.items():
-        total += 1
-        actual = pred_obj.get(key)
-        if _normalize(actual) == _normalize(expected):
-            matches += 1
-
-    return matches / total if total > 0 else 0.0
 
 
 def _normalize(value) -> str:

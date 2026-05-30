@@ -1,4 +1,4 @@
-"""Pre-flight permissions check for the AdvPO workflow.
+"""Pre-flight permissions check for the Advanced Prompt Optimization workflow.
 
 Validates that the caller has the necessary AWS permissions before starting
 the optimization workflow. Reports missing permissions and suggests which
@@ -309,7 +309,7 @@ def check_bedrock_create_job(session: boto3.Session, region: str) -> CheckResult
                 service="Bedrock",
                 action="bedrock:CreateAdvancedPromptOptimizationJob + GetFoundationModel",
                 status="allowed",
-                message="Can create AdvPO jobs and query model info.",
+                message="Can create Advanced Prompt Optimization jobs and query model info.",
             )
         return CheckResult(
             service="Bedrock",
@@ -339,7 +339,7 @@ def check_bedrock_create_job(session: boto3.Session, region: str) -> CheckResult
 def print_report(report: PreflightReport) -> None:
     """Print a formatted preflight report."""
     print("=" * 60)
-    print("AdvPO Workflow — Pre-flight Permissions Check")
+    print("Advanced Prompt Optimization Workflow — Pre-flight Permissions Check")
     print("=" * 60)
     print()
     print(f"  Caller: {report.identity_arn}")
@@ -380,7 +380,7 @@ def print_report(report: PreflightReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Pre-flight permissions check for the AdvPO workflow."
+        description="Pre-flight permissions check for the Advanced Prompt Optimization workflow."
     )
     parser.add_argument(
         "--bucket",

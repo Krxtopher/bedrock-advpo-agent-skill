@@ -1,4 +1,4 @@
-"""Deploy a Lambda evaluator function for AdvPO.
+"""Deploy a Lambda evaluator function for Advanced Prompt Optimization.
 
 Handles the full deployment lifecycle:
 1. Create IAM role with trust policy for Lambda and Bedrock
@@ -35,7 +35,7 @@ Usage:
         --region us-east-1 \
         --role-name my-custom-evaluator-role
 
-    # Grant invoke access to a different role (e.g., the role that creates AdvPO jobs):
+    # Grant invoke access to a different role (e.g., the role that creates Advanced Prompt Optimization jobs):
     python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
         --function-name advpo-check-evaluator \
         --source prompt-optimization/evaluator/lambda_function.py \
@@ -109,7 +109,7 @@ def create_iam_role(
         kwargs: dict = {
             "RoleName": role_name,
             "AssumeRolePolicyDocument": TRUST_POLICY,
-            "Description": "Execution role for AdvPO Lambda evaluator",
+            "Description": "Execution role for Advanced Prompt Optimization Lambda evaluator",
         }
         if tags:
             kwargs["Tags"] = [{"Key": k, "Value": v} for k, v in tags]
@@ -178,7 +178,7 @@ def create_lambda_function(
             "Role": role_arn,
             "Code": {"ZipFile": zip_bytes},
             "Timeout": 900,
-            "Description": "AdvPO custom evaluator function",
+            "Description": "Advanced Prompt Optimization custom evaluator function",
         }
         if tags:
             kwargs["Tags"] = tags
@@ -271,7 +271,7 @@ def parse_tags(tag_strings: list[str] | None) -> list[dict[str, str]] | None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Deploy a Lambda evaluator function for AdvPO."
+        description="Deploy a Lambda evaluator function for Advanced Prompt Optimization."
     )
     parser.add_argument(
         "--function-name",
@@ -301,7 +301,7 @@ def main() -> None:
         "--invoker-role",
         help=(
             "ARN of an additional IAM role to grant lambda:InvokeFunction. "
-            "Use when the role that creates AdvPO jobs differs from the role "
+            "Use when the role that creates Advanced Prompt Optimization jobs differs from the role "
             "deploying the function (e.g., deploy with admin, run jobs with "
             "a scoped-down role)."
         ),

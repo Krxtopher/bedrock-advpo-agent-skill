@@ -1,4 +1,4 @@
-# Bedrock AdvPO Agent Skill
+# Bedrock Advanced Prompt Optimization Agent Skill
 
 IMPORTANT: Never update this file without getting confirmation from the user to approve the changes you propose.
 
