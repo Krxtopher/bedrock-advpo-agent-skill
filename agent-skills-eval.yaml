@@ -15,7 +15,7 @@ root: ./skills
 workspace: ./agent-skills-workspace
 baseline: true
 target: bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0
-judge: bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0
+judge: bedrock/us.anthropic.claude-opus-4-6-v1
 baseUrl: http://localhost:4000/v1
 apiKeyEnv: LITELLM_API_KEY
 concurrency: 2
