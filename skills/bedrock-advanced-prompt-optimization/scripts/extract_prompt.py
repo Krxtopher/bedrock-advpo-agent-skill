@@ -6,19 +6,19 @@ for use.
 
 Usage:
     # From local results file:
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --results prompt-optimization/results.jsonl \
         --output prompts/my-prompt-optimized.md
 
     # From S3 (using job ARN):
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --job-arn "arn:aws:bedrock:us-east-1:123456789012:advanced-prompt-optimization-job/abc123" \
-        --output-s3-uri "s3://my-bucket/advpo/output/" \
+        --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
         --output prompts/my-prompt-optimized.md \
         --region us-east-1
 
     # Extract a specific template/model when results contain multiple:
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --results prompt-optimization/results.jsonl \
         --output prompts/my-prompt-optimized.md \
         --template-id "my-template-v1" \

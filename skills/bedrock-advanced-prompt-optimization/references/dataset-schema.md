@@ -49,8 +49,8 @@ Each line in the JSONL file must follow this schema:
 
 ## Output Layout
 
-For a job with output S3 URI `s3://my-bucket/advpo/output/`, results land at:
+For a job with output S3 URI `s3://my-bucket/prompt-optimization/my-job/output/`, results land at:
 
-    s3://my-bucket/advpo/output/<job-id>/advanced_prompt_optimization_results.jsonl
+    s3://my-bucket/prompt-optimization/my-job/output/<job-id>/advanced_prompt_optimization_results.jsonl
 
 where `<job-id>` is the trailing segment of the job ARN. Each job gets its own subfolder, so you can reuse the same output prefix across many jobs safely. CI integrations can fetch results directly without going through `parse_results.py`.

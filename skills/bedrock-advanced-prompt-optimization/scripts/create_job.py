@@ -312,7 +312,7 @@ def main() -> None:
         print()
         print("Monitor with:")
         print(
-            f"  python .kiro/skills/bedrock-advpo/scripts/manage_job.py status "
+            f"  python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/manage_job.py status "
             f'--job-arn "{job_arn}" --region {args.region}'
         )
 

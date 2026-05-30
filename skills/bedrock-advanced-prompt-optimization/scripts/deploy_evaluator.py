@@ -15,29 +15,29 @@ exits with a non-zero code and reports which step failed and why, leaving
 partial resources in place so the agent can diagnose and retry.
 
 Usage:
-    python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-        --function-name advpo-check-evaluator \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+        --function-name prompt-opt-evaluator \
         --source prompt-optimization/evaluator/lambda_function.py \
         --region us-east-1
 
     # With a specific profile and tags:
-    python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-        --function-name advpo-check-evaluator \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+        --function-name prompt-opt-evaluator \
         --source prompt-optimization/evaluator/lambda_function.py \
         --region us-east-1 \
         --profile admin-933 \
         --tags owner=schultkr project=check-extraction
 
     # Custom role name:
-    python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-        --function-name advpo-check-evaluator \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+        --function-name prompt-opt-evaluator \
         --source prompt-optimization/evaluator/lambda_function.py \
         --region us-east-1 \
         --role-name my-custom-evaluator-role
 
     # Grant invoke access to a different role (e.g., the role that creates Advanced Prompt Optimization jobs):
-    python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-        --function-name advpo-check-evaluator \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+        --function-name prompt-opt-evaluator \
         --source prompt-optimization/evaluator/lambda_function.py \
         --region us-east-1 \
         --profile admin-933 \

@@ -1,22 +1,22 @@
 """Delete AWS resources created during an Advanced Prompt Optimization workflow.
 
-Reads advpo-resources.json and deletes each tracked resource,
+Reads resources.json and deletes each tracked resource,
 prompting for confirmation by resource type.
 
 Usage:
-    python .kiro/skills/bedrock-advpo/scripts/cleanup_resources.py \
-        --resources advpo-resources.json \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/cleanup_resources.py \
+        --resources resources.json \
         --region us-east-1
 
     # Skip confirmation prompts:
-    python .kiro/skills/bedrock-advpo/scripts/cleanup_resources.py \
-        --resources advpo-resources.json \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/cleanup_resources.py \
+        --resources resources.json \
         --region us-east-1 \
         --yes
 
     # Delete only specific resource types:
-    python .kiro/skills/bedrock-advpo/scripts/cleanup_resources.py \
-        --resources advpo-resources.json \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/cleanup_resources.py \
+        --resources resources.json \
         --region us-east-1 \
         --types lambda iam s3
 """
@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 
-RESOURCE_TYPES = ["lambda", "iam_role", "s3", "advpo_job"]
+RESOURCE_TYPES = ["lambda", "iam_role", "s3", "optimization_job"]
 
 
 def delete_lambda(arn: str, region: str) -> bool:
@@ -80,7 +80,7 @@ def delete_s3_object(uri: str, region: str) -> bool:
     return result.returncode == 0
 
 
-def delete_advpo_job(arn: str, region: str) -> bool:
+def delete_optimization_job(arn: str, region: str) -> bool:
     """Delete an Advanced Prompt Optimization job."""
     result = subprocess.run(
         ["aws", "bedrock", "delete-advanced-prompt-optimization-job",
@@ -95,14 +95,14 @@ DELETE_HANDLERS = {
     "lambda": delete_lambda,
     "iam_role": delete_iam_role,
     "s3": delete_s3_object,
-    "advpo_job": delete_advpo_job,
+    "optimization_job": delete_optimization_job,
 }
 
 TYPE_LABELS = {
     "lambda": "Lambda Functions",
     "iam_role": "IAM Roles",
     "s3": "S3 Objects",
-    "advpo_job": "Advanced Prompt Optimization Jobs",
+    "optimization_job": "Advanced Prompt Optimization Jobs",
 }
 
 
@@ -114,13 +114,13 @@ def confirm(prompt: str) -> bool:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Delete AWS resources tracked in advpo-resources.json."
+        description="Delete AWS resources tracked in resources.json."
     )
     parser.add_argument(
         "--resources",
         type=Path,
-        default=Path("advpo-resources.json"),
-        help="Path to the resources JSON file (default: advpo-resources.json).",
+        default=Path("resources.json"),
+        help="Path to the resources JSON file (default: resources.json).",
     )
     parser.add_argument(
         "--region",

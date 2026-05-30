@@ -5,15 +5,15 @@ the optimization workflow. Reports missing permissions and suggests which
 operations require an elevated role.
 
 Usage:
-    python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
         --bucket my-bucket \
-        --s3-prefix advpo/input \
+        --s3-prefix prompt-optimization/my-job/input \
         --region us-east-1
 
     # Test a specific profile:
-    python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
         --bucket my-bucket \
-        --s3-prefix advpo/input \
+        --s3-prefix prompt-optimization/my-job/input \
         --region us-east-1 \
         --profile admin-933
 """
@@ -389,8 +389,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--s3-prefix",
-        default="advpo",
-        help="S3 key prefix to test write access (default: advpo).",
+        default="prompt-optimization",
+        help="S3 key prefix to test write access (default: prompt-optimization).",
     )
     parser.add_argument(
         "--region",

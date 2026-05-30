@@ -54,7 +54,7 @@ When gathering information from the user, use multiple-choice questions **only**
 **Mandatory confirmations — never infer these from context:**
 - **S3 bucket:** Always ask the user which S3 bucket to use. If the user's steering files or project context mention a bucket, offer it as a suggested default — but still confirm explicitly, since they may want to use a different one for this workflow.
 - **AWS region:** Always ask the user which region to use. If context suggests a likely region (e.g., the bucket name contains a region, or a steering file specifies one), offer it as a suggested default — but still confirm explicitly. The Advanced Prompt Optimization job, S3 bucket, and Lambda must all be in the same region, so this choice matters.
-- **S3 prefix:** Suggest a sensible default (e.g., `advpo/`) but confirm with the user before using it. They may have an existing folder structure or naming convention.
+- **S3 prefix:** Suggest a sensible default (e.g., `prompt-optimization/{job-name}/`) but confirm with the user before using it. They may have an existing folder structure or naming convention. The `{job-name}` segment should match the base job name the user provides, keeping each job's data isolated.
 
 **Critical formatting rule:** When asking a free-form question, output ONLY the question as a single sentence or short paragraph. Do NOT follow it with numbered options, bullet-point suggestions, or any structured list — even "helpful" ones. Structured lists trigger interactive selection UIs that prevent the user from typing a free-form answer. If you want to offer a suggestion, put it inline in the question itself (e.g., "What S3 bucket should I use? If you used one previously, I can reuse that.") — never as a separate numbered item.
 
@@ -71,7 +71,7 @@ prompt-optimization/
 ├── samples.json
 ├── dataset.jsonl
 ├── results.jsonl
-├── advpo-resources.json
+├── resources.json
 └── evaluator/
     ├── lambda_function.py
     └── test_evaluator.py
@@ -79,19 +79,19 @@ prompt-optimization/
 
 ## Resource Tracking
 
-Whenever you create an AWS resource (Lambda function, IAM role, S3 object, optimization job, etc.), append a reference to `prompt-optimization/advpo-resources.json`. Create the file if it doesn't exist. Format: `{"lambda": [{"id": "arn:...", "created": "2026-05-19"}], "iam_role": [...], "advpo_job": [...], "s3": [...]}`. Append to existing arrays — don't overwrite from a previous run.
+Whenever you create an AWS resource (Lambda function, IAM role, S3 object, optimization job, etc.), append a reference to `prompt-optimization/resources.json`. Create the file if it doesn't exist. Format: `{"lambda": [{"id": "arn:...", "created": "2026-05-19"}], "iam_role": [...], "optimization_job": [...], "s3": [...]}`. Append to existing arrays — don't overwrite from a previous run.
 
 ## Resource Cleanup
 
 After the optimization job completes and results have been successfully downloaded locally, offer to clean up the AWS resources that were created during the workflow. Use the cleanup script:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/cleanup_resources.py \
-  --resources prompt-optimization/advpo-resources.json \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/cleanup_resources.py \
+  --resources prompt-optimization/resources.json \
   --region us-east-1
 ```
 
-The script reads `advpo-resources.json`, groups resources by type, confirms deletion with the user for each type, and removes the entries from the file as they're deleted. Pass `--yes` to skip confirmation prompts, or `--types lambda s3` to delete only specific resource types.
+The script reads `resources.json`, groups resources by type, confirms deletion with the user for each type, and removes the entries from the file as they're deleted. Pass `--yes` to skip confirmation prompts, or `--types lambda s3` to delete only specific resource types.
 
 Note: Some resources (like a Lambda evaluator) may be worth keeping for future optimization runs. Mention this to the user before running cleanup.
 
@@ -124,7 +124,7 @@ When a user wants to optimize a prompt, follow this workflow in order. Each step
 - Prompt files (`.md`, `.txt`) — these may be the prompt template to optimize
 - Ground truth files (`*ground_truth*.json`, `*gt*.json`) — indicates structured evaluation data exists
 - Image or PDF assets — suggests a multimodal extraction task
-- An existing `prompt-optimization/` directory — indicates a previous run; check for `advpo-resources.json`, `samples.json`, or `dataset.jsonl` that can be reused
+- An existing `prompt-optimization/` directory — indicates a previous run; check for `resources.json`, `samples.json`, or `dataset.jsonl` that can be reused
 - Data schemas or example outputs — helps you understand the expected structure
 
 Use what you find to ask more informed questions and offer specific recommendations. For example, if you see ground truth JSON files paired with images, you already know this is a structured extraction task with multimodal input — you can skip asking about the task type and instead confirm your understanding with the user.
@@ -138,9 +138,9 @@ If the user invokes this skill without providing details about their task (e.g.,
 Before starting the workflow, run the pre-flight permissions check to verify the caller has the access needed for each step. This prevents mid-workflow failures and helps the user decide which role to use.
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
   --bucket my-bucket \
-  --s3-prefix advpo \
+  --s3-prefix prompt-optimization/my-job \
   --region us-east-1 \
   --profile admin-933  # optional: test a specific profile
 ```
@@ -296,10 +296,10 @@ Every workflow produces a `prompt-optimization/samples.json` file. This is the s
 Use `build_multimodal_samples.py` to upload documents to S3 and generate the samples file:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/build_multimodal_samples.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/build_multimodal_samples.py \
   --assets-dir path/to/documents \
   --bucket my-bucket \
-  --s3-prefix advpo/documents \
+  --s3-prefix prompt-optimization/my-job/documents \
   --output prompt-optimization/samples.json \
   --region us-east-1
 ```
@@ -349,7 +349,7 @@ Note: `referenceResponse` can be omitted for samples without ground truth (as sh
 Use `prepare_dataset.py` to validate and format the input dataset:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/prepare_dataset.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/prepare_dataset.py \
   --output prompt-optimization/dataset.jsonl \
   --template-id "my-template-v1" \
   --prompt-template-file prompts/my-prompt.md \
@@ -369,7 +369,7 @@ Run `--help` for the full list of options including inline prompt strings and LL
 ### Step 7: Upload Dataset to S3
 
 ```bash
-aws s3 cp prompt-optimization/dataset.jsonl s3://my-bucket/advpo/input/dataset.jsonl --region us-east-1
+aws s3 cp prompt-optimization/dataset.jsonl s3://my-bucket/prompt-optimization/my-job/input/dataset.jsonl --region us-east-1
 ```
 
 The S3 bucket **must be in the same region** as the optimization job.
@@ -379,10 +379,10 @@ The S3 bucket **must be in the same region** as the optimization job.
 **Job naming:** The script automatically appends a short unique hex suffix (4 characters) to the job name to avoid naming conflicts with previous runs. Pass a descriptive base name (e.g., `check-extraction-nova2lite`) and the script handles uniqueness — no need to generate a suffix manually.
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/create_job.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/create_job.py \
   --job-name "my-optimization-job-a3f7" \
-  --input-s3-uri "s3://my-bucket/advpo/input/dataset.jsonl" \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --input-s3-uri "s3://my-bucket/prompt-optimization/my-job/input/dataset.jsonl" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --models "us.amazon.nova-2-lite-v1:0" \
   --region us-east-1 \
   --tags owner=my-alias
@@ -400,7 +400,7 @@ For multi-model comparison:
 ### Step 9: Monitor Job Status
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/manage_job.py status \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/manage_job.py status \
   --job-arn "arn:aws:bedrock:us-east-1:123456789012:advanced-prompt-optimization-job/abc123" \
   --region us-east-1
 ```
@@ -413,9 +413,9 @@ Other commands:
 ### Step 10: Parse and Display Results
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/parse_results.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/parse_results.py \
   --job-arn "arn:aws:bedrock:..." \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --region us-east-1
 ```
 
@@ -431,16 +431,16 @@ Options:
 After showing results, always offer to save the optimized prompt as a clean, ready-to-use file. Use `extract_prompt.py`:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
   --results prompt-optimization/results.jsonl \
   --output prompts/my-prompt-optimized.md
 ```
 
 Or directly from S3:
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
   --job-arn "arn:aws:bedrock:..." \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --output prompts/my-prompt-optimized.md \
   --region us-east-1
 ```
@@ -486,8 +486,8 @@ The `build_multimodal_samples.py` script handles this pattern automatically when
 Use `deploy_evaluator.py` to handle the full deployment lifecycle in a single command:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-  --function-name advpo-check-evaluator \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+  --function-name prompt-opt-evaluator \
   --source prompt-optimization/evaluator/lambda_function.py \
   --region us-east-1 \
   --profile admin-933 \
