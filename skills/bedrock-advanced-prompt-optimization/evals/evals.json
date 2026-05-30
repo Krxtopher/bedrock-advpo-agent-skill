@@ -146,6 +146,16 @@
             ]
         },
         {
+            "id": "s3-prefix-includes-job-name",
+            "name": "Suggests S3 prefix with job-specific segment",
+            "prompt": "I'm ready to upload my dataset. My bucket is my-test-bucket, region is us-east-1, and the job name is invoice-extraction. What S3 prefix should I use?",
+            "expected_output": "The agent suggests an S3 prefix that includes the job name as a unique segment, like prompt-optimization/invoice-extraction/.",
+            "assertions": [
+                "The suggested S3 prefix includes the job name or a job-specific identifier as a path segment.",
+                "The suggested S3 prefix does NOT use a generic flat prefix like 'prompt-optimization/' without a job-specific segment."
+            ]
+        },
+        {
             "id": "what-to-expect-runtime",
             "name": "Sets expectations about job runtime when asked",
             "prompt": "How long will my optimization job take to run?",
