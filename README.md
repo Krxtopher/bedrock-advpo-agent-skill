@@ -91,6 +91,34 @@ In Kiro IDE, activate the skill by mentioning prompt optimization, Advanced Prom
 
 For other compatible agents, point them at the `SKILL.md` file for the full workflow instructions.
 
+## Running Behavioral Evals
+
+The skill includes behavioral evaluations that test whether an agent follows the SKILL.md instructions correctly. These use [agent-skills-eval](https://github.com/darkrishabh/agent-skills-eval) with Claude Sonnet on Bedrock via [LiteLLM](https://docs.litellm.ai/) as a proxy.
+
+### Prerequisites
+
+1. AWS credentials configured (default profile with Bedrock access)
+2. LiteLLM installed: `pip install litellm[proxy]`
+3. Node.js dependencies: `npm install`
+
+### Running
+
+In one terminal, start the LiteLLM proxy:
+
+```bash
+npm run eval:proxy
+```
+
+In another terminal, run the evals:
+
+```bash
+LITELLM_API_KEY=sk-1234 npm run eval
+```
+
+(LiteLLM requires an API key but doesn't validate it when running locally — any value works.)
+
+Results are written to `agent-skills-workspace/` with an HTML report.
+
 ## License
 
 Internal use.

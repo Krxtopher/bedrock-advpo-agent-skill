@@ -6,6 +6,7 @@
   "scripts": {
     "eval": "npx agent-skills-eval --config agent-skills-eval.yaml",
     "eval:no-baseline": "npx agent-skills-eval --config agent-skills-eval.yaml --no-baseline",
+    "eval:proxy": "litellm --model bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0 --port 4000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
