@@ -4,6 +4,10 @@ This document covers setting up the development environment, running behavioral 
 
 ## Setup
 
+The project uses two runtimes:
+- **Python** — the skill's scripts (what the agent runs during optimization workflows) and the LiteLLM proxy for eval routing
+- **Node.js** — the `agent-skills-eval` test harness that runs behavioral evals
+
 ### Python
 
 ```bash
