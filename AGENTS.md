@@ -4,7 +4,6 @@
 
 ```
 skills/bedrock-advanced-prompt-optimization/  — The canonical skill source (installed via `npx skills add`)
-.kiro/skills/bedrock-advanced-prompt-optimization  — Symlink to skills/ for local Kiro development
 agent-skills-eval.yaml  — Behavioral eval configuration
 litellm-config.yaml     — LiteLLM proxy model routing for evals
 ```
