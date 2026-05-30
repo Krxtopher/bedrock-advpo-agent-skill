@@ -2,13 +2,18 @@
 
 This document covers setting up the development environment, running behavioral evals, and understanding the project structure.
 
+## Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- AWS CLI configured with credentials that have Bedrock access
+- An AWS account with Claude Sonnet and Claude Opus model access enabled
+
 ## Setup
 
-The project uses two runtimes:
-- **Python** — the skill's scripts (what the agent runs during optimization workflows) and the LiteLLM proxy for eval routing
-- **Node.js** — the `agent-skills-eval` test harness that runs behavioral evals
-
 ### Python
+
+Used for skill scripts and behavioral eval calls which leverage Amazon Bedrock.
 
 ```bash
 python -m venv .venv
@@ -17,6 +22,8 @@ pip install -r requirements.txt
 ```
 
 ### Node.js
+
+Use when running the `agent-skills-eval` test harness that runs behavioral evals 
 
 ```bash
 npm install
