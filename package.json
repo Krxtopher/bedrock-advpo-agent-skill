@@ -7,6 +7,8 @@
     "eval": "npx agent-skills-eval --config agent-skills-eval.yaml",
     "eval:no-baseline": "npx agent-skills-eval --config agent-skills-eval.yaml --no-baseline",
     "eval:proxy": "litellm --config litellm-config.yaml --port 4000",
+    "eval:inspect": "inspect eval inspect_evals/task.py --model none --model-role grader=anthropic/bedrock/us.anthropic.claude-opus-4-6-v1",
+    "eval:inspect:deterministic": "inspect eval inspect_evals/task.py@skill_eval_deterministic --model none",
     "test": "python -m pytest tests/ -v"
   },
   "repository": {

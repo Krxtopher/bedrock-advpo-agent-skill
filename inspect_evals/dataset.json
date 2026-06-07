@@ -1,0 +1,87 @@
+[
+    {
+        "input": "I want to optimize a prompt for better performance.",
+        "target": "The response ends with or contains a question directed at the user. The response does NOT contain multiple numbered questions or a list of questions asking for different pieces of information.",
+        "id": "single-question-at-a-time",
+        "metadata": {
+            "scorer_type": "deterministic",
+            "scorer_name": "single_question_per_turn"
+        }
+    },
+    {
+        "input": "I want to optimize a prompt. It's for a single model.",
+        "target": "The response does NOT contain a numbered list of model names. The response does NOT present model options as multiple-choice items. If a model question is asked, it is asked as a free-form open-ended question.",
+        "id": "no-model-list",
+        "metadata": {
+            "scorer_type": "deterministic",
+            "scorer_name": "no_numbered_model_list"
+        }
+    },
+    {
+        "input": "Help me optimize a prompt.",
+        "target": "The response includes the phrase 'Amazon Bedrock Advanced Prompt Optimization' or 'Bedrock Advanced Prompt Optimization'. The response does NOT use the abbreviation 'AdvPO'.",
+        "id": "formal-name-first-mention",
+        "metadata": {
+            "scorer_type": "deterministic",
+            "scorer_name": "does_not_use_advpo_abbreviation"
+        }
+    },
+    {
+        "input": "I'm writing a Lambda evaluator. Should my scoring function return values from 0 to 100 or 0 to 1?",
+        "target": "The response recommends using the 0.0 to 1.0 range. The response does NOT recommend using 0 to 100.",
+        "id": "score-scale-guidance",
+        "metadata": {
+            "scorer_type": "deterministic",
+            "scorer_name": "score_range_recommends_zero_to_one"
+        }
+    },
+    {
+        "input": "Write me a Lambda evaluator that checks if the model output contains a date in YYYY-MM-DD format. Don't ask me for additional detail, just write the code.",
+        "target": "The generated code does NOT contain 're.compile'. The generated code uses an alternative like re.search, re.match, re.findall, re.sub, or string methods. The code starts from or references the lambda-evaluator-template.py structure (lambda_handler with preds/golds keys).",
+        "id": "sandbox-avoids-re-compile",
+        "metadata": {
+            "scorer_type": "deterministic",
+            "scorer_name": "does_not_contain_re_compile"
+        }
+    },
+    {
+        "input": "I want to compare how Claude Sonnet 4.5 and Nova 2 Lite perform on my prompt. Will I get one optimized prompt that works for both?",
+        "target": "The response explains that each model gets its own independently-optimized prompt. The response clarifies this is NOT a single shared prompt across models.",
+        "id": "multi-model-semantics",
+        "metadata": {
+            "scorer_type": "llm_judge"
+        }
+    },
+    {
+        "input": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator since it's a structured extraction task with clear right/wrong answers in JSON ground truth. My samples are ready. I already have my evaluator written and tested. Now I need to upload the dataset to S3. What's next?",
+        "target": "The response asks the user which S3 bucket to use rather than assuming one. The response does NOT assume or use a bucket without asking.",
+        "id": "asks-for-s3-bucket",
+        "metadata": {
+            "scorer_type": "llm_judge"
+        }
+    },
+    {
+        "input": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What's next?",
+        "target": "The response asks the user which AWS region to use. The response does NOT assume a region without confirming with the user.",
+        "id": "asks-for-region",
+        "metadata": {
+            "scorer_type": "llm_judge"
+        }
+    },
+    {
+        "input": "I want to optimize a prompt but I'm not sure which model to use. What do you recommend?",
+        "target": "The response does NOT say 'I recommend' followed by a specific model name. The response suggests using multi-model comparison to evaluate, OR directs the user to look up model capabilities. The response does NOT rank models or say one is 'better' than another.",
+        "id": "no-model-recommendations",
+        "metadata": {
+            "scorer_type": "llm_judge"
+        }
+    },
+    {
+        "input": "I want to optimize a prompt for a single model. The model is Nova 2 Lite. I have ground truth data with clear right/wrong answers. What evaluation method should I use?",
+        "target": "The response mentions at least one evaluation method by name (Lambda evaluator, LLM-as-a-judge, or steering criteria). The response provides a brief explanation of what at least one method does or when it's appropriate. The response does NOT simply ask the user to pick without any context about what the options mean.",
+        "id": "educate-as-you-go",
+        "metadata": {
+            "scorer_type": "llm_judge"
+        }
+    }
+]

@@ -1,0 +1,18 @@
+{
+    "enabled": true,
+    "name": "Shell Command Info",
+    "description": "Before executing any shell command, provides a brief explanation of what the command does and a safety analysis highlighting risks. Skips the safety analysis if a similar command was already used earlier in the conversation.",
+    "version": "1",
+    "when": {
+        "type": "preToolUse",
+        "toolTypes": [
+            "shell"
+        ]
+    },
+    "then": {
+        "type": "askAgent",
+        "prompt": "Before executing this shell command, provide a brief explanation and (when applicable) a risk assessment.\n\nRULES:\n- Use future tense (e.g. \"Will run...\").\n- If a similar command (same tool, same general pattern/purpose) was already executed or analyzed earlier in this conversation, provide ONLY the one-line explanation. DO NOT reference the previous use.\n- Keep everything concise — a few sentences max.\n\nSAFETY ANALYSIS (only if a similar command has NOT appeared earlier in this conversation):\nAssess whether this command pattern poses risks. Consider:\n- Could this pattern be exploited for malicious purposes?\n- Any destructive side effects?\n\nNEVER-TRUST PATTERNS (always flag as risky):\n- Inline code execution: python3 -c *, python -c *, node -e *, node --eval *, ruby -e *, perl -e *, bash -c *, sh -c *, eval *\n- Broad interpreter wildcards: python3 *, python *, .venv/bin/python *, node *, ts-node *, ruby *, perl *, bash *, sh *\nThese allow arbitrary code execution. Always warn the user.\n\nFORMAT when risk analysis IS required:\n\n💡 **Command Explainer:** {one-line explanation}.\n**Risks**: {brief risk summary}.\n\nFORMAT when risk analysis is NOT required:\n\n💡 **Command Explainer:** {one-line explanation}.\n"
+    },
+    "workspaceFolderName": "fs-image-benchmark",
+    "shortName": "shell-command-explainer"
+}

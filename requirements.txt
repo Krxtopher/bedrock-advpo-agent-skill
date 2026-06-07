@@ -6,3 +6,7 @@ litellm[proxy]>=1.86.0
 
 # Testing
 pytest>=8.0.0
+
+# Inspect AI eval framework
+inspect-ai>=0.3.74
+aioboto3>=13.0.0
