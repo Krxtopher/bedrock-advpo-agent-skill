@@ -1,4 +1,4 @@
-"""Extract the optimized prompt from AdvPO results and save as a clean file.
+"""Extract the optimized prompt from Advanced Prompt Optimization results and save as a clean file.
 
 Reads the results JSONL (local or from S3), extracts the optimized prompt
 template for a given template ID and model, and writes it to a file ready
@@ -6,19 +6,19 @@ for use.
 
 Usage:
     # From local results file:
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --results prompt-optimization/results.jsonl \
         --output prompts/my-prompt-optimized.md
 
     # From S3 (using job ARN):
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --job-arn "arn:aws:bedrock:us-east-1:123456789012:advanced-prompt-optimization-job/abc123" \
-        --output-s3-uri "s3://my-bucket/advpo/output/" \
+        --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
         --output prompts/my-prompt-optimized.md \
         --region us-east-1
 
     # Extract a specific template/model when results contain multiple:
-    python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
         --results prompt-optimization/results.jsonl \
         --output prompts/my-prompt-optimized.md \
         --template-id "my-template-v1" \
@@ -164,8 +164,8 @@ def extract_optimized_prompt(
         print("ERROR: No optimized prompt template found.", file=sys.stderr)
         sys.exit(1)
 
-    # Convert AdvPO escaped braces back to normal braces
-    # AdvPO uses {{ and }} to escape literal braces in the template
+    # Convert Advanced Prompt Optimization escaped braces back to normal braces
+    # Advanced Prompt Optimization uses {{ and }} to escape literal braces in the template
     optimized_template = optimized_template.replace("{{", "{").replace("}}", "}")
 
     return optimized_template
@@ -173,7 +173,7 @@ def extract_optimized_prompt(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Extract the optimized prompt from AdvPO results."
+        description="Extract the optimized prompt from Advanced Prompt Optimization results."
     )
 
     # Source: local file or S3

@@ -1,6 +1,6 @@
 """Create a Bedrock Advanced Prompt Optimization job.
 
-This script creates an AdvPO job with the specified configuration and returns
+This script creates an Advanced Prompt Optimization job with the specified configuration and returns
 the job ARN for tracking. Includes a pre-flight check to verify model access.
 
 A short hex suffix is automatically appended to the job name to prevent naming
@@ -23,15 +23,75 @@ def generate_job_suffix() -> str:
     return hashlib.sha256(timestamp.encode()).hexdigest()[:4]
 
 
+def check_inference_profile(client, model_id: str) -> bool:
+    """Confirm a CRIS profile is registered in this region.
+
+    Returns True if the model ID is non-prefixed (no profile needed) or
+    the profile is found. Returns False if a prefixed ID is given but
+    the profile isn't listed.
+    """
+    if "." not in model_id:
+        return True
+    parts = model_id.split(".", 1)
+    if len(parts[0]) > 3:
+        return True  # not a region prefix
+
+    try:
+        paginator = client.get_paginator("list_inference_profiles")
+        for page in paginator.paginate():
+            for profile in page.get("inferenceProfileSummaries", []):
+                if profile.get("inferenceProfileId") == model_id:
+                    return True
+        return False
+    except ClientError:
+        # If we can't list, don't block — fall back to base-model check.
+        return True
+
+
+def check_multimodal_compatible(
+    client, model_id: str, dataset_has_multimodal: bool
+) -> tuple[bool, str]:
+    """Reject text-only models when the dataset contains images/PDFs."""
+    if not dataset_has_multimodal:
+        return True, ""
+
+    base = model_id.split(".", 1)[1] if "." in model_id and len(model_id.split(".", 1)[0]) <= 3 else model_id
+    try:
+        response = client.get_foundation_model(modelIdentifier=base)
+        modalities = set(
+            response.get("modelDetails", {}).get("inputModalities", [])
+        )
+        if "IMAGE" in modalities or "DOCUMENT" in modalities:
+            return True, ""
+        return False, f"{model_id} does not accept multimodal input"
+    except ClientError:
+        # If we can't check, don't block.
+        return True, ""
+
+
 def check_model_access(
     client,
     model_ids: list[str],
     region: str,
+    dataset_has_multimodal: bool = False,
 ) -> list[str]:
     """Check that all target models are accessible. Returns list of inaccessible models."""
     inaccessible = []
 
     for model_id in model_ids:
+        # Check CRIS inference profile exists for prefixed model IDs
+        if not check_inference_profile(client, model_id):
+            inaccessible.append(f"{model_id} (CRIS profile not found in {region})")
+            continue
+
+        # Check multimodal compatibility
+        compatible, reason = check_multimodal_compatible(
+            client, model_id, dataset_has_multimodal
+        )
+        if not compatible:
+            inaccessible.append(reason)
+            continue
+
         # Cross-region inference profile IDs (e.g. us.anthropic.claude-...) won't
         # resolve via GetFoundationModel. Strip the region prefix to check the base model.
         base_model_id = model_id
@@ -77,6 +137,7 @@ def create_job(
     kms_key_id: str | None = None,
     skip_preflight: bool = False,
     tags: list[dict[str, str]] | None = None,
+    dataset_has_multimodal: bool = False,
 ) -> dict:
     """Create an Advanced Prompt Optimization job."""
     session_kwargs: dict = {}
@@ -89,7 +150,9 @@ def create_job(
     # Pre-flight model access check
     if not skip_preflight:
         print("Checking model access...", file=sys.stderr)
-        inaccessible = check_model_access(client, model_ids, region)
+        inaccessible = check_model_access(
+            client, model_ids, region, dataset_has_multimodal
+        )
         if inaccessible:
             print(
                 f"ERROR: The following models are not accessible in {region}:\n"
@@ -171,6 +234,12 @@ def main() -> None:
         help="Skip the pre-flight model access check.",
     )
     parser.add_argument(
+        "--dataset-has-multimodal",
+        action="store_true",
+        help="Indicate the dataset contains multimodal samples. "
+        "Rejects text-only models during preflight.",
+    )
+    parser.add_argument(
         "--tags",
         nargs="*",
         metavar="KEY=VALUE",
@@ -219,6 +288,7 @@ def main() -> None:
             kms_key_id=args.kms_key_id,
             skip_preflight=args.skip_preflight,
             tags=tags,
+            dataset_has_multimodal=args.dataset_has_multimodal,
         )
     except SystemExit:
         raise
@@ -242,7 +312,7 @@ def main() -> None:
         print()
         print("Monitor with:")
         print(
-            f"  python .kiro/skills/bedrock-advpo/scripts/manage_job.py status "
+            f"  python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/manage_job.py status "
             f'--job-arn "{job_arn}" --region {args.region}'
         )
 

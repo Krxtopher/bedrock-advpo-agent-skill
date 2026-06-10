@@ -1,4 +1,4 @@
-"""Build an AdvPO samples JSON file from local multimodal (image/PDF) files.
+"""Build an Advanced Prompt Optimization samples JSON file from local multimodal (image/PDF) files.
 
 This script is only needed for multimodal datasets — where each evaluation
 sample includes a document image or PDF alongside the prompt. For text-only
@@ -20,19 +20,19 @@ Each ground truth file (mode 1) must have a corresponding document file:
 
 Usage:
     # With ground truth:
-    python .kiro/skills/bedrock-advpo/scripts/build_multimodal_samples.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/build_multimodal_samples.py \
         --assets-dir assets/bank-checks \
         --bucket my-bucket \
-        --s3-prefix advpo/images \
+        --s3-prefix prompt-optimization/my-job/images \
         --output prompt-optimization/samples.json \
         --region us-east-1
 
     # Without ground truth:
-    python .kiro/skills/bedrock-advpo/scripts/build_multimodal_samples.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/build_multimodal_samples.py \
         --assets-dir assets/bank-checks \
         --no-ground-truth \
         --bucket my-bucket \
-        --s3-prefix advpo/images \
+        --s3-prefix prompt-optimization/my-job/images \
         --output prompt-optimization/samples.json \
         --region us-east-1
 """
@@ -72,7 +72,7 @@ def upload_to_s3(local_path: Path, bucket: str, key: str, region: str) -> tuple[
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build AdvPO samples JSON from ground truth + document files."
+        description="Build Advanced Prompt Optimization samples JSON from ground truth + document files."
     )
     parser.add_argument(
         "--assets-dir",
@@ -87,8 +87,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--s3-prefix",
-        default="advpo/documents",
-        help="S3 key prefix for uploaded files (default: advpo/documents).",
+        default="prompt-optimization/documents",
+        help="S3 key prefix for uploaded files (default: prompt-optimization/documents).",
     )
     parser.add_argument(
         "--output",

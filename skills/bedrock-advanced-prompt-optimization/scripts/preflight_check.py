@@ -1,19 +1,19 @@
-"""Pre-flight permissions check for the AdvPO workflow.
+"""Pre-flight permissions check for the Advanced Prompt Optimization workflow.
 
 Validates that the caller has the necessary AWS permissions before starting
 the optimization workflow. Reports missing permissions and suggests which
 operations require an elevated role.
 
 Usage:
-    python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
         --bucket my-bucket \
-        --s3-prefix advpo/input \
+        --s3-prefix prompt-optimization/my-job/input \
         --region us-east-1
 
     # Test a specific profile:
-    python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+    python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
         --bucket my-bucket \
-        --s3-prefix advpo/input \
+        --s3-prefix prompt-optimization/my-job/input \
         --region us-east-1 \
         --profile admin-933
 """
@@ -309,7 +309,7 @@ def check_bedrock_create_job(session: boto3.Session, region: str) -> CheckResult
                 service="Bedrock",
                 action="bedrock:CreateAdvancedPromptOptimizationJob + GetFoundationModel",
                 status="allowed",
-                message="Can create AdvPO jobs and query model info.",
+                message="Can create Advanced Prompt Optimization jobs and query model info.",
             )
         return CheckResult(
             service="Bedrock",
@@ -339,7 +339,7 @@ def check_bedrock_create_job(session: boto3.Session, region: str) -> CheckResult
 def print_report(report: PreflightReport) -> None:
     """Print a formatted preflight report."""
     print("=" * 60)
-    print("AdvPO Workflow — Pre-flight Permissions Check")
+    print("Advanced Prompt Optimization Workflow — Pre-flight Permissions Check")
     print("=" * 60)
     print()
     print(f"  Caller: {report.identity_arn}")
@@ -380,7 +380,7 @@ def print_report(report: PreflightReport) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Pre-flight permissions check for the AdvPO workflow."
+        description="Pre-flight permissions check for the Advanced Prompt Optimization workflow."
     )
     parser.add_argument(
         "--bucket",
@@ -389,8 +389,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--s3-prefix",
-        default="advpo",
-        help="S3 key prefix to test write access (default: advpo).",
+        default="prompt-optimization",
+        help="S3 key prefix to test write access (default: prompt-optimization).",
     )
     parser.add_argument(
         "--region",

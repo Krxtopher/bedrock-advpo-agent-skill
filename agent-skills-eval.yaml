@@ -1,0 +1,34 @@
+# Agent Skills Eval configuration
+# Run with: npm run eval
+#
+# Prerequisites:
+#   1. Install LiteLLM: pip install litellm[proxy]
+#   2. Start the proxy: litellm --model bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0
+#      (uses your default AWS credentials automatically)
+#   3. Run: npm run eval
+#
+# LiteLLM translates OpenAI-compatible API calls to Bedrock Converse API,
+# which is required because Anthropic models on Bedrock don't support the
+# OpenAI-compatible Chat Completions endpoint directly.
+
+root: ./skills
+workspace: ./agent-skills-workspace
+baseline: true
+target: bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0
+judge: bedrock/us.anthropic.claude-opus-4-6-v1
+baseUrl: http://localhost:4000/v1
+apiKeyEnv: LITELLM_API_KEY
+concurrency: 2
+layout: iteration
+strict: false
+report:
+  enabled: true
+  title: Advanced Prompt Optimization Skill Evals
+logging:
+  format: pretty
+  verbose: false
+  color: auto
+targetParams:
+  temperature: 0
+judgeParams:
+  temperature: 0

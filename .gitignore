@@ -3,6 +3,9 @@
 assets
 prompts
 prompt-optimization
+node_modules/
+agent-skills-workspace/
+.kiro/skills/agent-memory
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -158,7 +158,7 @@ def format_results(content: str, verbose: bool = False) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Parse and display AdvPO job results."
+        description="Parse and display Advanced Prompt Optimization job results."
     )
     parser.add_argument(
         "--job-arn",

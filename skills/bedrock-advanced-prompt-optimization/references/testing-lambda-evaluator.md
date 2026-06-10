@@ -1,6 +1,6 @@
 # Testing a Lambda Evaluator
 
-Every time you write a Lambda evaluator function, you must also write a local test script that validates the function before deployment. This catches bugs early — a broken evaluator silently produces bad scores, which means AdvPO optimizes in the wrong direction and the user wastes time and money on a job that looked successful but produced garbage prompts.
+Every time you write a Lambda evaluator function, you must also write a local test script that validates the function before deployment. This catches bugs early — a broken evaluator silently produces bad scores, which means Advanced Prompt Optimization optimizes in the wrong direction and the user wastes time and money on a job that looked successful but produced garbage prompts.
 
 ## When to Write the Test
 

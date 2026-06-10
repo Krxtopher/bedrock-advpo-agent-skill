@@ -1,0 +1,159 @@
+{
+    "skill_name": "bedrock-advanced-prompt-optimization",
+    "evals": [
+        {
+            "id": "single-question-at-a-time",
+            "name": "Asks exactly one question per turn",
+            "prompt": "I want to optimize a prompt for better performance.",
+            "expected_output": "The agent asks a single question and waits for a response.",
+            "assertions": [
+                "The response ends with or contains a question directed at the user.",
+                "The response does NOT contain multiple numbered questions or a list of questions asking for different pieces of information."
+            ]
+        },
+        {
+            "id": "no-model-list",
+            "name": "Does not present models as numbered options",
+            "prompt": "I want to optimize a prompt. It's for a single model.",
+            "expected_output": "The agent asks which model to use as a free-form question without listing options.",
+            "assertions": [
+                "The response does NOT contain a numbered list of model names.",
+                "The response does NOT present model options as multiple-choice items.",
+                "If a model question is asked, it is asked as a free-form open-ended question."
+            ]
+        },
+        {
+            "id": "formal-name-first-mention",
+            "name": "Uses full formal name on first mention",
+            "prompt": "Help me optimize a prompt.",
+            "expected_output": "The agent uses the full name 'Amazon Bedrock Advanced Prompt Optimization' on first mention.",
+            "assertions": [
+                "The response includes the phrase 'Amazon Bedrock Advanced Prompt Optimization' or 'Bedrock Advanced Prompt Optimization'.",
+                "The response does NOT use the abbreviation 'AdvPO'."
+            ]
+        },
+        {
+            "id": "educate-as-you-go",
+            "name": "Explains concepts before asking user to decide",
+            "prompt": "I want to optimize a prompt for a single model. The model is Nova 2 Lite. I have ground truth data with clear right/wrong answers. What evaluation method should I use?",
+            "expected_output": "The agent explains what evaluation methods are available and why one might be better, before or alongside asking the user to choose.",
+            "assertions": [
+                "The response mentions at least one evaluation method by name (Lambda evaluator, LLM-as-a-judge, or steering criteria).",
+                "The response provides a brief explanation of what at least one method does or when it's appropriate.",
+                "The response does NOT simply ask the user to pick without any context about what the options mean."
+            ]
+        },
+        {
+            "id": "multi-model-semantics",
+            "name": "Clarifies that multi-model produces independent prompts",
+            "prompt": "I want to compare how Claude Sonnet 4.5 and Nova 2 Lite perform on my prompt. Will I get one optimized prompt that works for both?",
+            "expected_output": "The agent clarifies that multi-model mode produces independently-optimized prompts per model, not a shared one.",
+            "assertions": [
+                "The response explains that each model gets its own independently-optimized prompt.",
+                "The response clarifies this is NOT a single shared prompt across models."
+            ]
+        },
+        {
+            "id": "score-scale-guidance",
+            "name": "Recommends 0.0-1.0 score range",
+            "prompt": "I'm writing a Lambda evaluator. Should my scoring function return values from 0 to 100 or 0 to 1?",
+            "expected_output": "The agent recommends using the 0.0 to 1.0 range.",
+            "assertions": [
+                "The response recommends using the 0.0 to 1.0 range.",
+                "The response does NOT recommend using 0 to 100."
+            ]
+        },
+        {
+            "id": "asks-for-s3-bucket",
+            "name": "Always asks user for S3 bucket explicitly",
+            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator since it's a structured extraction task with clear right/wrong answers in JSON ground truth. My samples are ready. I already have my evaluator written and tested. Now I need to upload the dataset to S3. What's next?",
+            "expected_output": "The agent asks the user which S3 bucket to use rather than assuming one.",
+            "assertions": [
+                "The response asks the user which S3 bucket to use.",
+                "The response does NOT assume or use a bucket without asking."
+            ]
+        },
+        {
+            "id": "asks-for-region",
+            "name": "Always asks user for AWS region explicitly",
+            "prompt": "Here's a recap of what we've discussed so far: I'm optimizing a prompt for Nova 2 Lite (single model). I'll use a Lambda evaluator for structured extraction. My samples are ready, evaluator is deployed, and my S3 bucket is my-test-bucket. What's next?",
+            "expected_output": "The agent asks which AWS region to use.",
+            "assertions": [
+                "The response asks the user which AWS region to use.",
+                "The response does NOT assume a region without confirming with the user."
+            ]
+        },
+        {
+            "id": "no-model-recommendations",
+            "name": "Does not proactively recommend specific models",
+            "prompt": "I want to optimize a prompt but I'm not sure which model to use. What do you recommend?",
+            "expected_output": "The agent does NOT recommend a specific model. Instead it suggests multi-model comparison or points the user to documentation.",
+            "assertions": [
+                "The response does NOT say 'I recommend' followed by a specific model name.",
+                "The response suggests using multi-model comparison to evaluate, OR directs the user to look up model capabilities.",
+                "The response does NOT rank models or say one is 'better' than another."
+            ]
+        },
+        {
+            "id": "sandbox-avoids-re-compile",
+            "name": "Generates evaluator code without re.compile()",
+            "prompt": "Write me a Lambda evaluator that checks if the model output contains a date in YYYY-MM-DD format. Don't ask me for additional detail, just write the code.",
+            "expected_output": "The agent produces evaluator code that does NOT use re.compile(). It may use re.search(), re.match(), re.findall(), or string methods instead.",
+            "assertions": [
+                "The generated code does NOT contain 're.compile'.",
+                "The generated code uses an alternative like re.search, re.match, re.findall, re.sub, or string methods to check the date format.",
+                "The code starts from or references the lambda-evaluator-template.py structure (lambda_handler with preds/golds keys)."
+            ]
+        },
+        {
+            "id": "sample-count-guidance",
+            "name": "Provides sample count guidance when asked",
+            "prompt": "How many evaluation samples should I include in my dataset?",
+            "expected_output": "The agent recommends 30-80 samples as the sweet spot.",
+            "assertions": [
+                "The response mentions a recommended range that includes numbers between 30 and 80.",
+                "The response warns against too few samples (risk of overfitting) or mentions diminishing returns beyond a certain count."
+            ]
+        },
+        {
+            "id": "negative-unrelated-task",
+            "name": "Does not trigger on unrelated prompts",
+            "prompt": "Write a Python function that sorts a list of dictionaries by a given key.",
+            "expected_output": "The agent responds with a sorting function without mentioning prompt optimization.",
+            "assertions": [
+                "The response does NOT mention prompt optimization, Advanced Prompt Optimization, or evaluation datasets.",
+                "The response provides a Python sorting function or relevant coding help."
+            ]
+        },
+        {
+            "id": "steering-criteria-guidance",
+            "name": "Recommends few specific criteria over many vague ones",
+            "prompt": "I'm going to use steering criteria for my optimization. I was thinking of using: ACCURATE, CONCISE, WELL-FORMATTED, CLEAR, HELPFUL. Is that good?",
+            "expected_output": "The agent suggests reducing to 1-3 specific criteria and explains why fewer is better.",
+            "assertions": [
+                "The response suggests using fewer criteria (1-3 is ideal).",
+                "The response explains that overlapping or vague criteria dilute the optimization signal."
+            ]
+        },
+        {
+            "id": "s3-prefix-includes-job-name",
+            "name": "Suggests S3 prefix with job-specific segment",
+            "prompt": "I'm ready to upload my dataset. My bucket is my-test-bucket, region is us-east-1, and the job name is invoice-extraction. What S3 prefix should I use?",
+            "expected_output": "The agent suggests an S3 prefix that includes the job name as a unique segment, like prompt-optimization/invoice-extraction/.",
+            "assertions": [
+                "The suggested S3 prefix includes the job name or a job-specific identifier as a path segment.",
+                "The suggested S3 prefix does NOT use a generic flat prefix like 'prompt-optimization/' without a job-specific segment."
+            ]
+        },
+        {
+            "id": "what-to-expect-runtime",
+            "name": "Sets expectations about job runtime when asked",
+            "prompt": "How long will my optimization job take to run?",
+            "expected_output": "The agent provides runtime guidance mentioning 15-20 minutes for small jobs and that multi-model scales linearly.",
+            "assertions": [
+                "The response mentions an approximate runtime (minutes for small jobs).",
+                "The response mentions that multi-model jobs take longer or scale with model count."
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
-# Suggested Target Models for AdvPO
+# Suggested Target Models for Advanced Prompt Optimization
 
-AdvPO works with any text-generation model available through Amazon Bedrock. This list contains commonly-used models that make good optimization targets. When suggesting models to the user, draw from this list and use the exact model IDs shown — do not invent or guess model IDs.
+Advanced Prompt Optimization works with any text-generation model available through Amazon Bedrock. This list contains commonly-used models that make good optimization targets. When suggesting models to the user, draw from this list and use the exact model IDs shown — do not invent or guess model IDs.
 
 > **This list may not be exhaustive.** New models are added to Bedrock regularly. If the user asks about a model not listed here, or if you want to confirm what's currently available in their account and region, run:
 > ```bash
@@ -9,7 +9,7 @@ AdvPO works with any text-generation model available through Amazon Bedrock. Thi
 
 ## Cross-Region Inference Prefixes
 
-Many models require a cross-region inference prefix to be invoked. When using these models as AdvPO targets, prepend the appropriate prefix to the model ID:
+Many models require a cross-region inference prefix to be invoked. When using these models as Advanced Prompt Optimization targets, prepend the appropriate prefix to the model ID:
 
 | Prefix | Meaning |
 |--------|---------|
@@ -20,7 +20,7 @@ Many models require a cross-region inference prefix to be invoked. When using th
 
 Example: `us.anthropic.claude-sonnet-4-5-20250929-v1:0`
 
-Cross-region model IDs are valid for AdvPO's `--models` parameter and are often required for newer models that aren't available as single-region endpoints. If a job fails with an access error, try adding the appropriate prefix.
+Cross-region model IDs are valid for Advanced Prompt Optimization's `--models` parameter and are often required for newer models that aren't available as single-region endpoints. If a job fails with an access error, try adding the appropriate prefix.
 
 ## Amazon
 

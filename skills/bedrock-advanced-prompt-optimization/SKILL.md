@@ -1,10 +1,10 @@
 ---
 name: bedrock-advanced-prompt-optimization
 description: >
-  Create, manage, and analyze Bedrock Advanced Prompt Optimization (AdvPO) jobs.
+  Create, manage, and analyze Bedrock Advanced Prompt Optimization jobs.
   Use when the user wants to optimize prompts, compare model performance, migrate
   between models, or prepare evaluation datasets for prompt optimization. Activate
-  whenever you see mentions of prompt optimization, AdvPO, prompt tuning, model
+  whenever you see mentions of prompt optimization, prompt tuning, model
   migration, evaluation-driven prompt improvement, prompt engineering at scale,
   A/B testing prompts across models, or improving prompt quality with ground truth
   data. Also use when the user mentions JSONL datasets for prompt evaluation,
@@ -20,24 +20,24 @@ metadata:
 
 > **IMPORTANT:** This skill is designed to work in vibe (conversational) sessions. Do NOT suggest switching to a spec session. Execute the workflow directly in the current session.
 
-# Bedrock Advanced Prompt Optimization (AdvPO)
+# Bedrock Advanced Prompt Optimization
 
-**Naming convention:** When responding to users, always use the full formal name "Amazon Bedrock Advanced Prompt Optimization (AdvPO)" on first mention in a conversation. After that initial introduction, you may use "AdvPO" as shorthand.
+**Naming convention:** When responding to users, always use the full formal name "Amazon Bedrock Advanced Prompt Optimization" on first mention in a conversation. After that initial introduction, you may use "Advanced Prompt Optimization" as shorthand.
 
 This skill lets you work with Amazon Bedrock's Advanced Prompt Optimization feature. It provides CLI scripts to prepare input datasets, create and monitor optimization jobs, and parse results.
 
-## What is AdvPO?
+## What is Advanced Prompt Optimization?
 
 Advanced Prompt Optimization takes your prompt templates, evaluation samples, and an evaluation method, then runs iterative inference → evaluate → rewrite loops. It outputs optimized prompts with evaluation metrics for each target model.
 
-**How it optimizes:** AdvPO rewrites the *static instruction text* in your prompt template to improve performance on the target model. Any `{{placeholder}}` variables are the parts it **preserves** — they represent the dynamic runtime inputs (user questions, context, etc.) that stay the same. Everything else in the template is fair game for rewriting.
+**How it optimizes:** The optimizer rewrites the *static instruction text* in your prompt template to improve performance on the target model. Any `{{placeholder}}` variables are the parts it **preserves** — they represent the dynamic runtime inputs (user questions, context, etc.) that stay the same. Everything else in the template is fair game for rewriting.
 
 ## When Invoked Without a Request
 
 If the user activates this skill without providing a specific task or question — for example, they just type the skill name — respond with a brief, friendly introduction:
 
-1. Mention you've activated the Amazon Bedrock Advanced Prompt Optimization (AdvPO) skill.
-2. In 2–3 sentences, explain what AdvPO does and the kind of value it provides
+1. Mention you've activated the Amazon Bedrock Advanced Prompt Optimization skill.
+2. In 2–3 sentences, explain what Advanced Prompt Optimization does and the kind of value it provides
 3. Mention the types of tasks you can help with (optimizing a prompt for a specific model, comparing prompt performance across models, preparing evaluation datasets, implementing and deploying custom evaluators)
 4. Ask what they'd like to work on
 
@@ -47,31 +47,31 @@ Keep the introduction concise — no more than a short paragraph plus the questi
 
 **Single-threaded information gathering:** Ask exactly ONE question at a time. Wait for the user's response before asking the next question. Never combine multiple questions into a single message — even if you know you'll need several pieces of information, ask them sequentially. This makes it easy for the user to give clear, focused answers.
 
-**Educate as you go:** Assume the user has never used AdvPO before. With each question, include a brief sentence or two explaining *why* you're asking and how their answer will influence the optimization process. When introducing a concept for the first time (e.g., "Lambda evaluator," "steering criteria," "ANLS*," "cross-region inference"), give a plain-language explanation of what it is before asking the user to make a decision about it. The user shouldn't have to Google a term to answer your question. Keep it concise — a sentence or two of context, not a paragraph of lecture.
+**Educate as you go:** Assume the user has never used Advanced Prompt Optimization before. With each question, include a brief sentence or two explaining *why* you're asking and how their answer will influence the optimization process. When introducing a concept for the first time (e.g., "Lambda evaluator," "steering criteria," "ANLS*," "cross-region inference"), give a plain-language explanation of what it is before asking the user to make a decision about it. The user shouldn't have to Google a term to answer your question. Keep it concise — a sentence or two of context, not a paragraph of lecture.
 
 When gathering information from the user, use multiple-choice questions **only** when the question has a finite, known set of valid options (e.g., single vs. multi-model, evaluation method, region). Use free-form text input for user-specific values (model name, S3 bucket, S3 prefix, job name, file paths, template IDs, Lambda ARNs). Never fabricate example values as multiple-choice options for user-specific inputs.
 
 **Mandatory confirmations — never infer these from context:**
 - **S3 bucket:** Always ask the user which S3 bucket to use. If the user's steering files or project context mention a bucket, offer it as a suggested default — but still confirm explicitly, since they may want to use a different one for this workflow.
-- **AWS region:** Always ask the user which region to use. If context suggests a likely region (e.g., the bucket name contains a region, or a steering file specifies one), offer it as a suggested default — but still confirm explicitly. The AdvPO job, S3 bucket, and Lambda must all be in the same region, so this choice matters.
-- **S3 prefix:** Suggest a sensible default (e.g., `advpo/`) but confirm with the user before using it. They may have an existing folder structure or naming convention.
+- **AWS region:** Always ask the user which region to use. If context suggests a likely region (e.g., the bucket name contains a region, or a steering file specifies one), offer it as a suggested default — but still confirm explicitly. The Advanced Prompt Optimization job, S3 bucket, and Lambda must all be in the same region, so this choice matters.
+- **S3 prefix:** Suggest a sensible default (e.g., `prompt-optimization/{job-name}/`) but confirm with the user before using it. They may have an existing folder structure or naming convention. The `{job-name}` segment should match the base job name the user provides, keeping each job's data isolated.
 
 **Critical formatting rule:** When asking a free-form question, output ONLY the question as a single sentence or short paragraph. Do NOT follow it with numbered options, bullet-point suggestions, or any structured list — even "helpful" ones. Structured lists trigger interactive selection UIs that prevent the user from typing a free-form answer. If you want to offer a suggestion, put it inline in the question itself (e.g., "What S3 bucket should I use? If you used one previously, I can reuse that.") — never as a separate numbered item.
 
 ## Resource Tagging
 
-Before creating any AWS resources (Lambda functions, IAM roles, AdvPO jobs, etc.), ask the user if they'd like to apply a tag. Ask once early in the workflow and reuse their answer for all resources created during the session. If they provide a tag, apply it consistently to every resource you create. If they decline, proceed without tags.
+Before creating any AWS resources (Lambda functions, IAM roles, optimization jobs, etc.), ask the user if they'd like to apply a tag. Ask once early in the workflow and reuse their answer for all resources created during the session. If they provide a tag, apply it consistently to every resource you create. If they decline, proceed without tags.
 
 ## File Organization
 
-All files generated during the optimization workflow — samples, datasets, Lambda code, test scripts, results, and the resource tracking file — should be placed under a `prompt-optimization/` directory in the user's working directory. Create this directory at the start of the workflow if it doesn't exist. This keeps AdvPO artifacts organized and separate from the rest of the project.
+All files generated during the optimization workflow — samples, datasets, Lambda code, test scripts, results, and the resource tracking file — should be placed under a `prompt-optimization/` directory in the user's working directory. Create this directory at the start of the workflow if it doesn't exist. This keeps optimization artifacts organized and separate from the rest of the project.
 
 ```
 prompt-optimization/
 ├── samples.json
 ├── dataset.jsonl
 ├── results.jsonl
-├── advpo-resources.json
+├── resources.json
 └── evaluator/
     ├── lambda_function.py
     └── test_evaluator.py
@@ -79,19 +79,19 @@ prompt-optimization/
 
 ## Resource Tracking
 
-Whenever you create an AWS resource (Lambda function, IAM role, S3 object, AdvPO job, etc.), append a reference to `prompt-optimization/advpo-resources.json`. Create the file if it doesn't exist. Format: `{"lambda": [{"id": "arn:...", "created": "2026-05-19"}], "iam_role": [...], "advpo_job": [...], "s3": [...]}`. Append to existing arrays — don't overwrite from a previous run.
+Whenever you create an AWS resource (Lambda function, IAM role, S3 object, optimization job, etc.), append a reference to `prompt-optimization/resources.json`. Create the file if it doesn't exist. Format: `{"lambda": [{"id": "arn:...", "created": "2026-05-19"}], "iam_role": [...], "optimization_job": [...], "s3": [...]}`. Append to existing arrays — don't overwrite from a previous run.
 
 ## Resource Cleanup
 
 After the optimization job completes and results have been successfully downloaded locally, offer to clean up the AWS resources that were created during the workflow. Use the cleanup script:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/cleanup_resources.py \
-  --resources prompt-optimization/advpo-resources.json \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/cleanup_resources.py \
+  --resources prompt-optimization/resources.json \
   --region us-east-1
 ```
 
-The script reads `advpo-resources.json`, groups resources by type, confirms deletion with the user for each type, and removes the entries from the file as they're deleted. Pass `--yes` to skip confirmation prompts, or `--types lambda s3` to delete only specific resource types.
+The script reads `resources.json`, groups resources by type, confirms deletion with the user for each type, and removes the entries from the file as they're deleted. Pass `--yes` to skip confirmation prompts, or `--types lambda s3` to delete only specific resource types.
 
 Note: Some resources (like a Lambda evaluator) may be worth keeping for future optimization runs. Mention this to the user before running cleanup.
 
@@ -124,12 +124,12 @@ When a user wants to optimize a prompt, follow this workflow in order. Each step
 - Prompt files (`.md`, `.txt`) — these may be the prompt template to optimize
 - Ground truth files (`*ground_truth*.json`, `*gt*.json`) — indicates structured evaluation data exists
 - Image or PDF assets — suggests a multimodal extraction task
-- An existing `prompt-optimization/` directory — indicates a previous run; check for `advpo-resources.json`, `samples.json`, or `dataset.jsonl` that can be reused
+- An existing `prompt-optimization/` directory — indicates a previous run; check for `resources.json`, `samples.json`, or `dataset.jsonl` that can be reused
 - Data schemas or example outputs — helps you understand the expected structure
 
 Use what you find to ask more informed questions and offer specific recommendations. For example, if you see ground truth JSON files paired with images, you already know this is a structured extraction task with multimodal input — you can skip asking about the task type and instead confirm your understanding with the user.
 
-If the user invokes this skill without providing details about their task (e.g., "use the AdvPO skill" or "help me optimize a prompt"), briefly introduce what AdvPO does, inspect the workspace for context, and then start at Step 1 with an informed question. Don't wait for the user to volunteer context — lead with what you've observed.
+If the user invokes this skill without providing details about their task (e.g., "use the Advanced Prompt Optimization skill" or "help me optimize a prompt"), briefly introduce what the service does, inspect the workspace for context, and then start at Step 1 with an informed question. Don't wait for the user to volunteer context — lead with what you've observed.
 
 **Example interaction flow:**
 
@@ -138,9 +138,9 @@ If the user invokes this skill without providing details about their task (e.g.,
 Before starting the workflow, run the pre-flight permissions check to verify the caller has the access needed for each step. This prevents mid-workflow failures and helps the user decide which role to use.
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/preflight_check.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/preflight_check.py \
   --bucket my-bucket \
-  --s3-prefix advpo \
+  --s3-prefix prompt-optimization/my-job \
   --region us-east-1 \
   --profile admin-933  # optional: test a specific profile
 ```
@@ -152,7 +152,7 @@ The script checks: S3 write access, Lambda create/invoke, IAM role creation, and
 **Example interaction flow:**
 ```
 User: "I want to optimize a prompt"
-Agent: → Brief intro to AdvPO, then Step 1: "Are you optimizing for a single model, or comparing across multiple?"
+Agent: → Brief intro to Advanced Prompt Optimization, then Step 1: "Are you optimizing for a single model, or comparing across multiple?"
 User: "Single model"
 Agent: → Step 2: "Which model would you like to optimize for?"
 User: "Nova 2 Lite"
@@ -169,15 +169,17 @@ This determines:
 - **Single model optimization:** Pass one model to `--models`. The goal is to get the best possible prompt for that specific model.
 - **Model comparison/migration:** Pass 2–5 models to `--models`. The goal is to see how the same prompt performs across models, or to find the best model for a given task.
 
+**Important:** When you pass multiple models, the optimizer produces an independently-optimized prompt for each model — not a single shared prompt. This is great for migration ("which model performs best with its own optimized prompt?") but it's not a head-to-head model benchmark. If you want to compare model A and model B on the *same* prompt, run the original prompt through Bedrock InvokeModel directly with each model and compare scores.
+
 Do NOT assume multi-model comparison. Default to single-model optimization unless the user explicitly asks to compare.
 
 ### Step 2: Select Target Model(s)
 
-AdvPO works with any text-generation model available through Amazon Bedrock. When helping the user choose:
+Advanced Prompt Optimization works with any text-generation model available through Amazon Bedrock. When helping the user choose:
 
 1. **Ask as a free-form question.** Do NOT present model selection as a multiple-choice list or numbered options. Never output a list of models for the user to pick from — this triggers interactive selection UIs that bypass the grounding check. Instead, simply ask: "Which model would you like to optimize for?" with no options listed.
 
-2. **Do NOT offer model recommendations.** Bedrock offers models from many providers, and the factors that go into choosing a model are complex and nuanced. Do not proactively suggest models or offer guidance on which to pick. If the user explicitly asks for help choosing, you may search the latest AWS documentation to provide basic details about model capabilities, but always inform them that the best way to choose a model is through running evaluations to compare performance — which is exactly what AdvPO's multi-model comparison mode is designed for.
+2. **Do NOT offer model recommendations.** Bedrock offers models from many providers, and the factors that go into choosing a model are complex and nuanced. Do not proactively suggest models or offer guidance on which to pick. If the user explicitly asks for help choosing, you may search the latest AWS documentation to provide basic details about model capabilities, but always inform them that the best way to choose a model is through running evaluations to compare performance — which is exactly what the multi-model comparison mode is designed for.
 
 3. **Use human-friendly names in conversation.** When presenting model options to the user, use the model's display name (e.g., "Nova 2 Lite", "Claude Sonnet 4.5", "Llama 4 Maverick"). Only show the raw model ID (e.g., `amazon.nova-2-lite-v1:0`) when you're constructing the actual CLI command or if the user asks for it. People think in names, not version-stamped identifiers.
 
@@ -229,7 +231,7 @@ If the user says "I'm not sure", point them to multi-model comparison as the bes
 
 ### Step 3: Choose the Evaluation Method
 
-The evaluation method directly steers how AdvPO rewrites the prompt — a vague evaluator produces vague improvements, while a precise one drives targeted gains. Ask the user about the nature of their task:
+The evaluation method directly steers how the optimizer rewrites the prompt — a vague evaluator produces vague improvements, while a precise one drives targeted gains. Ask the user about the nature of their task:
 
 > Is this a task with **clear right/wrong answers** (structured extraction, classification, exact formats), or is it more **open-ended** (summarization, creative writing, conversational)?
 
@@ -244,13 +246,15 @@ The evaluation method directly steers how AdvPO rewrites the prompt — a vague 
 | Creative / conversational | **LLM-as-a-judge** or **Steering criteria** | No single right answer. |
 | Quick iteration / exploration | **Steering criteria** or **System default** | Low setup cost. Good for initial experiments. |
 
-**Key principle:** If you have ground truth and can write a function to score correctness, use a Lambda evaluator. It's faster (no judge inference cost), cheaper, deterministic, and gives AdvPO a tighter optimization signal. Reserve LLM-as-a-judge for tasks where quality requires semantic judgment.
+**Prefer 1–3 specific criteria over 5 vague ones.** Overlapping criteria dilute the optimization signal and produce vague rewrites.
+
+**Key principle:** If you have ground truth and can write a function to score correctness, use a Lambda evaluator. It's faster (no judge inference cost), cheaper, deterministic, and gives the optimizer a tighter signal. Reserve LLM-as-a-judge for tasks where quality requires semantic judgment.
 
 If the user needs a Lambda evaluator, see the **Deploying a Lambda Evaluator** section below for setup instructions.
 
 ### Step 4: Design the Evaluator Metrics (Lambda evaluator only)
 
-Before writing any code, think carefully about which metrics best align with the user's task and goals. The scoring function is the optimization signal — if it measures the wrong thing, AdvPO will optimize in the wrong direction.
+Before writing any code, think carefully about which metrics best align with the user's task and goals. The scoring function is the optimization signal — if it measures the wrong thing, the optimizer will push in the wrong direction.
 
 **Analyze the ground truth structure.** Look at the user's ground truth data and consider each field individually:
 
@@ -271,13 +275,15 @@ Example: Invoice extraction
 
 **Discuss the approach with the user.** Before implementing, briefly explain your proposed scoring strategy and ask if it aligns with their priorities. Some users may want to weight certain fields more heavily, or may have domain-specific tolerance rules you wouldn't know about.
 
-**Keep the score continuous (0.0 to 1.0).** AdvPO converges better with granular scores than binary pass/fail. A per-field scoring approach naturally produces continuous values (e.g., 4 out of 5 fields correct = 0.8).
+**Keep the score continuous (0.0 to 1.0).** The optimizer converges better with granular scores than binary pass/fail. A per-field scoring approach naturally produces continuous values (e.g., 4 out of 5 fields correct = 0.8).
 
-**Start from the template.** When writing the Lambda function, always start from `examples/lambda-evaluator-template.py`. This template has the correct `lambda_handler` with the exact event key names (`preds` and `golds`) that AdvPO sends. Copy the template, then customize only the `compute_score` and `_score_single` functions with your scoring logic. Do NOT write the handler from scratch — the event key names are a common source of bugs.
+**Start from the template.** When writing the Lambda function, always start from `examples/lambda-evaluator-template.py`. This template has the correct `lambda_handler` with the exact event key names (`preds` and `golds`) that the service sends. Copy the template, then customize only the `compute_score` and `_score_single` functions with your scoring logic. Do NOT write the handler from scratch — the event key names are a common source of bugs.
+
+**Always emit scores in the 0.0–1.0 range.** Use this convention in both Lambda evaluators and LLM-as-a-judge prompts. Mixing 0–100 and 0.0–1.0 across evaluators silently miscalibrates optimization across templates.
 
 **Handle Markdown code fences in JSON output.** When the evaluator expects JSON structured output, some models wrap their JSON in Markdown code fences (e.g., ` ```json ... ``` `). Ask the user how to handle this:
 - **Tolerant mode:** Strip code fences before parsing the JSON. This is forgiving of a common model behavior and focuses the optimization on content accuracy rather than formatting.
-- **Strict mode:** Treat any response wrapped in code fences as a score of 0. This forces AdvPO to optimize the prompt until the model produces clean JSON without fences.
+- **Strict mode:** Treat any response wrapped in code fences as a score of 0. This forces the optimizer to rewrite the prompt until the model produces clean JSON without fences.
 
 The right choice depends on the downstream consumer. If the output feeds into a parser that handles fence-stripping, tolerant mode avoids penalizing otherwise-correct extractions. If the output goes directly into an API or pipeline that expects raw JSON, strict mode ensures the optimized prompt produces clean output.
 
@@ -290,10 +296,10 @@ Every workflow produces a `prompt-optimization/samples.json` file. This is the s
 Use `build_multimodal_samples.py` to upload documents to S3 and generate the samples file:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/build_multimodal_samples.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/build_multimodal_samples.py \
   --assets-dir path/to/documents \
   --bucket my-bucket \
-  --s3-prefix advpo/documents \
+  --s3-prefix prompt-optimization/my-job/documents \
   --output prompt-optimization/samples.json \
   --region us-east-1
 ```
@@ -336,12 +342,14 @@ The format is a JSON array of sample objects. Each sample must include `inputVar
 
 Note: `referenceResponse` can be omitted for samples without ground truth (as shown in the second sample above). Without it, you cannot use a Lambda evaluator — use steering criteria or LLM-as-a-judge instead.
 
+**Sample count and composition matter.** A representative dataset of 30–80 samples is the sweet spot — fewer than ~20 risks overfitting, and beyond ~80 you mostly add cost without much signal. The optimizer holds out a portion of your samples for evaluation of the optimized prompt, so include hard cases (ambiguous fields, edge formats, the failure modes you actually want fixed). A dataset dominated by trivial passing samples produces flat optimization curves — the optimizer learns most from your weakest examples.
+
 ### Step 6: Prepare the JSONL Dataset
 
 Use `prepare_dataset.py` to validate and format the input dataset:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/prepare_dataset.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/prepare_dataset.py \
   --output prompt-optimization/dataset.jsonl \
   --template-id "my-template-v1" \
   --prompt-template-file prompts/my-prompt.md \
@@ -361,20 +369,20 @@ Run `--help` for the full list of options including inline prompt strings and LL
 ### Step 7: Upload Dataset to S3
 
 ```bash
-aws s3 cp prompt-optimization/dataset.jsonl s3://my-bucket/advpo/input/dataset.jsonl --region us-east-1
+aws s3 cp prompt-optimization/dataset.jsonl s3://my-bucket/prompt-optimization/my-job/input/dataset.jsonl --region us-east-1
 ```
 
-The S3 bucket **must be in the same region** as the AdvPO job.
+The S3 bucket **must be in the same region** as the optimization job.
 
 ### Step 8: Create the Optimization Job
 
 **Job naming:** The script automatically appends a short unique hex suffix (4 characters) to the job name to avoid naming conflicts with previous runs. Pass a descriptive base name (e.g., `check-extraction-nova2lite`) and the script handles uniqueness — no need to generate a suffix manually.
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/create_job.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/create_job.py \
   --job-name "my-optimization-job-a3f7" \
-  --input-s3-uri "s3://my-bucket/advpo/input/dataset.jsonl" \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --input-s3-uri "s3://my-bucket/prompt-optimization/my-job/input/dataset.jsonl" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --models "us.amazon.nova-2-lite-v1:0" \
   --region us-east-1 \
   --tags owner=my-alias
@@ -382,7 +390,7 @@ python .kiro/skills/bedrock-advpo/scripts/create_job.py \
 
 The script performs a **pre-flight model access check** before creating the job. Use `--skip-preflight` to bypass if needed.
 
-Tags are passed as `key=value` pairs and applied directly to the AdvPO job at creation time. You can pass multiple tags: `--tags owner=schultkr project=check-extraction env=dev`.
+Tags are passed as `key=value` pairs and applied directly to the optimization job at creation time. You can pass multiple tags: `--tags owner=schultkr project=check-extraction env=dev`.
 
 For multi-model comparison:
 ```bash
@@ -392,7 +400,7 @@ For multi-model comparison:
 ### Step 9: Monitor Job Status
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/manage_job.py status \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/manage_job.py status \
   --job-arn "arn:aws:bedrock:us-east-1:123456789012:advanced-prompt-optimization-job/abc123" \
   --region us-east-1
 ```
@@ -405,9 +413,9 @@ Other commands:
 ### Step 10: Parse and Display Results
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/parse_results.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/parse_results.py \
   --job-arn "arn:aws:bedrock:..." \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --region us-east-1
 ```
 
@@ -423,16 +431,16 @@ Options:
 After showing results, always offer to save the optimized prompt as a clean, ready-to-use file. Use `extract_prompt.py`:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
   --results prompt-optimization/results.jsonl \
   --output prompts/my-prompt-optimized.md
 ```
 
 Or directly from S3:
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/extract_prompt.py \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/extract_prompt.py \
   --job-arn "arn:aws:bedrock:..." \
-  --output-s3-uri "s3://my-bucket/advpo/output/" \
+  --output-s3-uri "s3://my-bucket/prompt-optimization/my-job/output/" \
   --output prompts/my-prompt-optimized.md \
   --region us-east-1
 ```
@@ -441,13 +449,23 @@ Options:
 - `--template-id "my-template"` — select a specific template (when results contain multiple)
 - `--model "us.amazon.nova-2-lite-v1:0"` — select a specific model (when results contain multiple)
 
-The script handles converting AdvPO's escaped braces (`{{`/`}}`) back to normal braces for direct use.
+The script handles converting the service's escaped braces (`{{`/`}}`) back to normal braces for direct use.
+
+## What to Expect from a Job
+
+- **Runtime:** 15–20 minutes for a small single-model job; multi-model jobs scale roughly linearly with model count. Many templates × many samples can take hours.
+
+- **Cost:** All inference is billed at standard Bedrock on-demand pricing. As a rough planning guide, expect on the order of 15–20 target-model invocations per sample per model, plus a smaller number of feedback and judge invocations. A 5-model × 100-sample job is meaningful spend — don't treat it like a free experiment.
+
+- **Output prompts often look similar to the original.** The optimizer preserves sections that already work and rewrites only the parts that aren't pulling their weight. Judge success by the score delta in `parse_results.py`, not by how different the new prompt looks.
+
+- **Cross-region inference profiles:** If a job fails with a model-not-found or access error, the model probably needs a `us.` / `eu.` / `ap.` / `global.` prefix. Confirm with `aws bedrock list-inference-profiles --region <region>` that the exact prefixed ID is available before retrying.
 
 ## Multimodal-Only Prompts
 
 For use cases where the prompt processes a document/image with no text variables (e.g., extracting fields from a scanned check), the pattern is:
 
-1. The prompt template has **no `{{placeholder}}` variables** — it's just the instruction text. AdvPO will rewrite the instruction text to optimize it for the target model.
+1. The prompt template has **no `{{placeholder}}` variables** — it's just the instruction text. The optimizer will rewrite the instruction text to optimize it for the target model.
 2. Each sample **omits `inputVariables` entirely** (do NOT include an empty list or empty dict).
 3. The document is provided via `inputVariablesMultimodal`.
 
@@ -468,8 +486,8 @@ The `build_multimodal_samples.py` script handles this pattern automatically when
 Use `deploy_evaluator.py` to handle the full deployment lifecycle in a single command:
 
 ```bash
-python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
-  --function-name advpo-check-evaluator \
+python .kiro/skills/bedrock-advanced-prompt-optimization/scripts/deploy_evaluator.py \
+  --function-name prompt-opt-evaluator \
   --source prompt-optimization/evaluator/lambda_function.py \
   --region us-east-1 \
   --profile admin-933 \
@@ -478,7 +496,7 @@ python .kiro/skills/bedrock-advpo/scripts/deploy_evaluator.py \
 
 The script creates the IAM role (with Lambda + Bedrock trust), attaches the execution policy, waits for propagation, deploys the function, adds both required invoke permissions (Bedrock service + caller role), and verifies the function is Active.
 
-Options: `--role-name` (custom role name), `--profile` (elevated access), `--tags` (key=value pairs), `--invoker-role` (ARN of an additional role to grant invoke access — use when the role creating AdvPO jobs differs from the role deploying the function).
+Options: `--role-name` (custom role name), `--profile` (elevated access), `--tags` (key=value pairs), `--invoker-role` (ARN of an additional role to grant invoke access — use when the role creating optimization jobs differs from the role deploying the function).
 
 **On failure:** Reports which step failed with the exact error, exits non-zero, and leaves partial resources in place for diagnosis. If the function or role already exists, it updates rather than failing.
 
@@ -488,21 +506,15 @@ For detailed reference on the underlying IAM and Lambda requirements, see `refer
 
 ## Testing a Lambda Evaluator
 
-Every time you write a Lambda evaluator function, you must also write a local test script that validates it before deployment. A broken evaluator silently produces bad scores, causing AdvPO to optimize in the wrong direction.
+Every time you write a Lambda evaluator function, you must also write a local test script that validates it before deployment. A broken evaluator silently produces bad scores, causing the optimizer to push in the wrong direction.
 
-**Critical:** Always start your Lambda function from `examples/lambda-evaluator-template.py`. The template contains the correct `lambda_handler` with the exact event keys (`preds` and `golds`) that AdvPO uses. Customize only the scoring logic — never rewrite the handler from scratch.
+**Critical:** Always start your Lambda function from `examples/lambda-evaluator-template.py`. The template contains the correct `lambda_handler` with the exact event keys (`preds` and `golds`) that the service uses. Customize only the scoring logic — never rewrite the handler from scratch.
 
 For full testing conventions, example structure, and requirements, read `references/testing-lambda-evaluator.md`.
 
 ## Lambda Evaluator Sandbox Restrictions
 
-AdvPO validates Lambda evaluator code in a sandbox that blocks certain Python builtins considered dangerous. The most common pitfall:
-
-**`re.compile()` is blocked.** The sandbox flags any use of `compile()` — including `re.compile()` — and rejects the evaluator with: *"Metric code validation failed: Uses potentially dangerous builtin: compile()"*. This means the entire `re` module is effectively unusable.
-
-**What to use instead:** The template includes a `strip_code_fences()` utility that handles the most common case where regex would be tempting (stripping ` ```json ``` ` wrappers from model output). For other text manipulation, use string methods: `startswith()`, `endswith()`, `split()`, `strip()`, `replace()`, `find()`.
-
-**Always start from the template** (`examples/lambda-evaluator-template.py`) — it includes `strip_code_fences()` and documents these restrictions in its module docstring.
+Advanced Prompt Optimization statically scans evaluator code before accepting it. The full list of blocked function names, blocked module imports, and approved third-party libraries is documented in the `SANDBOX RESTRICTIONS` section of `examples/lambda-evaluator-template.py`. Always start from that template — it is the authoritative reference for what is and isn't allowed.
 
 ## Example LLMJ Prompts
 
@@ -546,7 +558,7 @@ For the full JSONL schema, field rules, and common mistakes to avoid, read `refe
 ## Important
 
 - **Jobs are asynchronous.** A single-template job with few samples takes 15–20 minutes. Many templates with many samples can take hours.
-- **Costs are inference-based.** All model invocations run in your account at standard Bedrock on-demand pricing. There is no separate AdvPO service charge.
+- **Costs are inference-based.** All model invocations run in your account at standard Bedrock on-demand pricing. There is no separate service charge.
 - **S3 bucket must be in the same region as the job.**
 - **Cross-region inference** may be used internally for evaluation and rewriting.
 - **Model access must be enabled** in your account for all target models. The `create_job.py` script checks this before submitting.
